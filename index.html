@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>GIVE YOUR PANEL A TITLE</title>
+		<script src="./lib/CSInterface.js"></script>		
+		<link rel="stylesheet" type="text/css" href="styles.css">
+		<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+		<script type="text/javascript">
+
+			function runAll() {
+				var cs = new CSInterface;
+				var youtubeLink = document.getElementById('youtubeLink').value;
+
+				// Create an object with the key "video_url" to match the expected format
+				var requestData = {
+					video_url: youtubeLink
+				};
+
+				// Send the POST request to the backend
+				fetch('http://127.0.0.1:8000/ytcreator/api/download_video', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(requestData)
+				})
+				.then(response => response.json())
+				.then(data => {
+					if (data.status === "success") {
+						var filePath = data.file_path;
+						cs.evalScript(`$.runScript.importVideo("${filePath}")`);
+					} else {
+						alert("An error occurred while downloading the video.");
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					alert("An error occurred while communicating with the server.");
+				});
+			}
+
+			
+		</script>
+	</head>
+
+	<body>
+		<label for="youtubeLink">Enter YouTube Link:</label>
+		<input type="text" id="youtubeLink" placeholder="Paste YouTube link here">
+		<button id="runButton" type="run" onclick="runAll()">Download and Import</button> 
+	</body>
+	
+</html>
