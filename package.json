@@ -13,6 +13,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "yt-dlp-wrap": "^2.3.11"
+    "youtube-dl-exec": "^2.4.7"
   }
 }
