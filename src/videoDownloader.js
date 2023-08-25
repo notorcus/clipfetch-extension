@@ -13,7 +13,7 @@ const downloadVideo = (youtubeLink) => {
 
     youtubedl(youtubeLink, {
         'output': videoPath,
-        'format': 'bestvideo+bestaudio/best',  // Download best video and audio format available
+        'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]',  // Fetch best MP4 video and M4A audio
         'no-check-certificate': true,
         'no-warnings': true,
         'prefer-free-formats': true,
