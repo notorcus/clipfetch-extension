@@ -9,37 +9,12 @@
 		<script type="text/javascript">
 
 			function runAll() {
-				var cs = new CSInterface;
 				var youtubeLink = document.getElementById('youtubeLink').value;
+				alert('Received link: ' + youtubeLink); // Alert after receiving the link
 
-				// Create an object with the key "video_url" to match the expected format
-				var requestData = {
-					video_url: youtubeLink
-				};
-
-				// Send the POST request to the backend
-				fetch('http://127.0.0.1:8000/ytcreator/api/download_video', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify(requestData)
-				})
-				.then(response => response.json())
-				.then(data => {
-					if (data.status === "success") {
-						var filePath = data.file_path;
-						cs.evalScript(`$.runScript.importVideo("${filePath}")`);
-					} else {
-						alert("An error occurred while downloading the video.");
-					}
-				})
-				.catch(error => {
-					console.error('Error:', error);
-					alert("An error occurred while communicating with the server.");
-				});
+				// Call the video download function
+				downloadVideo(youtubeLink);
 			}
-
 			
 		</script>
 	</head>
