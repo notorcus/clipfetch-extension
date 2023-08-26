@@ -26,15 +26,26 @@ function downloadStream(format, outputPath, link) {
         });
 
         ytDlp.on('close', (code) => {
-            console.log("yt-dlp output:", outputData);
+            // console.log("yt-dlp output:", outputData);
             if (code !== 0) {
                 console.log("Error output:", errorData);
                 reject(new Error(errorData));
             } else {
                 // Parse the output to get the filename
-                const match = outputData.match(/Destination:\s*(.+)|\[download\]\s*(.+?)\shas already been downloaded/);
-                if (match && match[1]) {
-                    const downloadedFilePath = match[1] ? match[1].trim() : match[2].trim();
+                const lines = outputData.split('\n');
+                let downloadedFilePath;
+
+                for (const line of lines) {
+                    if (line.startsWith('[download] C:\\')) {
+                        downloadedFilePath = line.replace('[download] ', '').split(' has already been downloaded')[0].trim();
+                        if (downloadedFilePath.endsWith('% of    3.83MiB')) {
+                            downloadedFilePath = downloadedFilePath.replace(' 100% of    3.83MiB', '').trim();
+                        }
+                        break;
+                    }
+                }
+
+                if (downloadedFilePath) {
                     resolve(downloadedFilePath);
                 } else {
                     reject(new Error("Couldn't parse the filename from yt-dlp output."));
@@ -43,6 +54,8 @@ function downloadStream(format, outputPath, link) {
         });
     });
 }
+
+
 
 
 
