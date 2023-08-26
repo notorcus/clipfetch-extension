@@ -13,7 +13,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@ffmpeg/ffmpeg": "^0.12.5",
     "youtube-dl-exec": "^2.4.7"
   }
 }
