@@ -3,18 +3,16 @@
 	<head>
 		<meta charset="utf-8">
 		<title>ClipFetch</title>
-		<script src="./lib/CSInterface.js"></script>		
-		<script src="./src/videoDownloader.js"></script>
 		<link rel="stylesheet" type="text/css" href="styles.css">
 		<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+		<script src="./lib/CSInterface.js" defer></script>		
+		<script src="./src/videoDownloader.js" defer></script>	
 		<script type="text/javascript">
 
 			function runAll() {
 				var youtubeLink = document.getElementById('youtubeLink').value;
-				alert('Received link: ' + youtubeLink); // Alert after receiving the link
-
-				// Call the video download function
-				downloadVideo(youtubeLink);
+				alert('Received link: ' + youtubeLink);
+				downloadAndConvertVideo(youtubeLink);
 			}
 			
 		</script>
