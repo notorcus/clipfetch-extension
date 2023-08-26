@@ -57,8 +57,16 @@ function downloadStream(format, outputPath, link) {
 
 function mergeStreams(videoFile, audioFile, outputPath) {
     return new Promise((resolve, reject) => {
-        const mergedFilename = `${outputPath}merged_output.mp4`;  // Modify filename as needed
-        const ffmpegPath = "ffmpeg";  // Use full path if ffmpeg is not globally accessible
+        // Extract title from videoFile using regex
+        const titleMatch = videoFile.match(/([^\\]+)_(?:video|audio)\.\w+$/);
+        if (!titleMatch) {
+            reject(new Error("Couldn't parse the title from the video file path."));
+            return;
+        }
+        const title = titleMatch[1];
+        const mergedFilename = `${outputPath}${title}.mp4`; 
+
+        const ffmpegPath = "ffmpeg";  
         const args = ['-y', '-i', videoFile, '-i', audioFile, '-c:v', 'libx264', '-preset', 'fast', '-c:a', 'aac', '-strict', 'experimental', '-f', 'mp4', mergedFilename];
 
         const ffmpeg = spawn(ffmpegPath, args);
@@ -78,6 +86,7 @@ function mergeStreams(videoFile, audioFile, outputPath) {
         });
     });
 }
+
 
 function downloadVideo(link, callback) {
     const outputPath = 'C:\\Users\\Akshat Kumar\\Editing\\Media\\PProClipFetch\\';
