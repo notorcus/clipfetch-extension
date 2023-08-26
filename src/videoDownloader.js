@@ -1,32 +1,46 @@
-// videoDownloader.js
-const { exec } = require('child_process');
+const { spawn } = require('child_process');
 
-function downloadVideo(link, callback) {
-    // Define the output directory and filenames
-    const outputPath = 'C:\\Users\\Akshat Kumar\\Editing\\Media\\PProClipFetch\\';
-    const videoFile = `"${outputPath}%(title)s_video.mp4"`;
-    const audioFile = `"${outputPath}%(title)s_audio.m4a"`;
-
-    // Download the best video stream
-    exec(`yt-dlp -f bestvideo[ext=mp4] -o ${videoFile} ${link}`, (error, stdout, stderr) => {
-        if (error) {
-            callback(error);
-            return;
+function downloadStream(format, outputPath, link) {
+    return new Promise((resolve, reject) => {
+        const ytDlpPath = "C:\\Users\\Akshat Kumar\\AppData\\Roaming\\Python\\Python311\\Scripts\\yt-dlp.exe";
+        const filename = `${outputPath}%(title)s_${format}.%(ext)s`;
+        
+        let args;
+        if (format === 'video') {
+            args = ['-f', 'bestvideo[acodec=none]', '-o', filename, link];
+        } else {
+            args = ['-f', 'bestaudio[vcodec=none]', '-o', filename, link];
         }
 
-        // Download the best audio stream
-        exec(`yt-dlp -f bestaudio[ext=m4a] -o ${audioFile} ${link}`, (audioError, audioStdout, audioStderr) => {
-            if (audioError) {
-                callback(audioError);
-                return;
-            }
+        const ytDlp = spawn(ytDlpPath, args);
 
-            // Return the video and audio file paths to the callback
-            callback(null, {
-                video: videoFile.replace(/"/g, ''),
-                audio: audioFile.replace(/"/g, '')
-            });
+        let errorData = '';
+        ytDlp.stderr.on('data', (data) => {
+            errorData += data;
         });
+
+        ytDlp.on('close', (code) => {
+            if (code !== 0) {
+                console.log("Error output:", errorData);
+                reject(new Error(errorData));
+            } else {
+                resolve(filename);
+            }
+        });
+    });
+}
+
+
+function downloadVideo(link, callback) {
+    const outputPath = 'C:\\Users\\Akshat Kumar\\Editing\\Media\\PProClipFetch\\';
+
+    Promise.all([
+        downloadStream('video', outputPath, link),
+        downloadStream('audio', outputPath, link)
+    ]).then(([videoFile, audioFile]) => {
+        callback(null, { video: videoFile, audio: audioFile });
+    }).catch(error => {
+        callback(error);
     });
 }
 

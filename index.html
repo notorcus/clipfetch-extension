@@ -17,12 +17,11 @@
 				// Call the downloadVideo function from videoDownloader.js
 				downloadVideo(youtubeLink, function(error, filepaths) {
 					if (error) {
-						alert('Error downloading: ' + error.message);
+						console.log('Error downloading: ' + error.message);
 						return;
 					}
 					
-					alert('Downloaded video saved as: ' + filepaths.video);
-					alert('Downloaded audio saved as: ' + filepaths.audio);
+					alert(`Downloaded videos saved`);
 
 					// Add any code to import the video into Premiere Pro or perform other tasks.
 				});
