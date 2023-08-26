@@ -1,4 +1,5 @@
 const { spawn } = require('child_process');
+const { exec } = require('child_process');
 
 function downloadStream(format, outputPath, link) {
     return new Promise((resolve, reject) => {
@@ -55,6 +56,16 @@ function downloadStream(format, outputPath, link) {
     });
 }
 
+function checkNvencSupport(callback) {
+    exec('ffmpeg -encoders | find "nvenc"', (error, stdout, stderr) => {
+        if (stdout.includes("nvenc")) {
+            callback(true);
+        } else {
+            callback(false);
+        }
+    });
+}
+
 function mergeStreams(videoFile, audioFile, outputPath) {
     return new Promise((resolve, reject) => {
         // Extract title from videoFile using regex
@@ -66,26 +77,38 @@ function mergeStreams(videoFile, audioFile, outputPath) {
         const title = titleMatch[1];
         const mergedFilename = `${outputPath}${title}.mp4`; 
 
-        const ffmpegPath = "ffmpeg";  
-        const args = ['-y', '-i', videoFile, '-i', audioFile, '-c:v', 'libx264', '-preset', 'fast', '-c:a', 'aac', '-strict', 'experimental', '-f', 'mp4', mergedFilename];
+        const ffmpegPath = "ffmpeg";
 
-        const ffmpeg = spawn(ffmpegPath, args);
-
-        let errorData = '';
-        ffmpeg.stderr.on('data', (data) => {
-            errorData += data;
-        });
-
-        ffmpeg.on('close', (code) => {
-            if (code !== 0) {
-                console.log("Error output:", errorData);
-                reject(new Error(errorData));
+        checkNvencSupport((supportsNvenc) => {
+            let args;
+            
+            if (supportsNvenc) {
+                console.log("Using NVENC for encoding.");
+                args = ['-y', '-i', videoFile, '-i', audioFile, '-c:v', 'h264_nvenc', '-preset', 'fast', '-c:a', 'aac', '-strict', 'experimental', '-f', 'mp4', mergedFilename];
             } else {
-                resolve(mergedFilename);
+                console.log("Using libx264 for encoding.");
+                args = ['-y', '-i', videoFile, '-i', audioFile, '-c:v', 'libx264', '-preset', 'fast', '-c:a', 'aac', '-strict', 'experimental', '-f', 'mp4', mergedFilename];
             }
+
+            const ffmpeg = spawn(ffmpegPath, args);
+
+            let errorData = '';
+            ffmpeg.stderr.on('data', (data) => {
+                errorData += data;
+            });
+
+            ffmpeg.on('close', (code) => {
+                if (code !== 0) {
+                    console.log("Error output:", errorData);
+                    reject(new Error(errorData));
+                } else {
+                    resolve(mergedFilename);
+                }
+            });
         });
     });
 }
+
 
 
 function downloadVideo(link, callback) {
