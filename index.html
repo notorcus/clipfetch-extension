@@ -22,6 +22,12 @@
 		<label for="youtubeLink">Enter YouTube Link:</label>
 		<input type="text" id="youtubeLink" placeholder="Paste YouTube link here">
 		<button id="runButton" type="run" onclick="runAll()">Download and Import</button> 
+
+		<!-- Progress bar -->
+		<div id="progressContainer" style="display: none;">
+			<progress id="progressBar" max="100" value="0"></progress>
+			<span id="statusMessage">Downloading...</span>
+		</div>
 	</body>
 	
 </html>
