@@ -55,15 +55,11 @@ function downloadStream(format, outputPath, link) {
     });
 }
 
-
-
-
-
 function mergeStreams(videoFile, audioFile, outputPath) {
     return new Promise((resolve, reject) => {
         const mergedFilename = `${outputPath}merged_output.mp4`;  // Modify filename as needed
         const ffmpegPath = "ffmpeg";  // Use full path if ffmpeg is not globally accessible
-        const args = ['-i', videoFile, '-i', audioFile, '-c:v', 'libx264', '-preset', 'fast', '-c:a', 'aac', '-strict', 'experimental', '-f', 'mp4', mergedFilename];
+        const args = ['-y', '-i', videoFile, '-i', audioFile, '-c:v', 'libx264', '-preset', 'fast', '-c:a', 'aac', '-strict', 'experimental', '-f', 'mp4', mergedFilename];
 
         const ffmpeg = spawn(ffmpegPath, args);
 
