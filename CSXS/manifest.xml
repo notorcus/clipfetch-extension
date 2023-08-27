@@ -20,7 +20,7 @@
 			<DispatchInfo >
 				<Resources>
 					<MainPath>./index.html</MainPath>
-					<ScriptPath>./jsx/extendScript.jsx</ScriptPath>
+					<ScriptPath>./src/extendScript.jsx</ScriptPath>
 					<CEFCommandLine>
 						<Parameter>--allow-file-access</Parameter>
 						<Parameter>--allow-file-access-from-files</Parameter>
