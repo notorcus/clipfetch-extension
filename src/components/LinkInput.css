@@ -15,7 +15,7 @@
   box-sizing: border-box;
   outline: none; 
   font-size: 11px;
-  margin-bottom: 10px;
+  
 }
 
 .link-input-field:focus {
@@ -23,4 +23,10 @@
   color: black;
   border: 1px solid #1473E6;  /* Update this line */
   outline: none;  /* Add this line */
+}
+
+.input-with-button {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
 }
