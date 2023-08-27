@@ -1,6 +1,7 @@
 body, button, input, textarea {
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
+    color: rgb(199, 199, 199); /* Text color */
 }
 
 .main-container {
