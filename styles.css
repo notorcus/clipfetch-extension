@@ -1,26 +1,35 @@
+/* styles.css */
 body {
     font-family: 'Roboto', sans-serif;
     font-weight: 500;
-    font-size: 15px;
     background-color: #232323;
     color: #d8d8d8;
     text-align: center;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-
 input {
+    
     display: block;
-    margin: auto;
-    max-width: 80%;
+    margin: 10px;  /* Adjust margin as per your requirements */
+    width: 150px;  /* Set a fixed width */
+    height: 0px;  /* Set a fixed height */
     padding: 15px 35px;
-    font-size: 15px;
+    font-size: 12px;
     font-family: 'Roboto', sans-serif;
     font-weight: 300; 
     border: 1px solid;
-    border-radius: 100px;
-    color: #ffffff;
-    background-color: #111111;
+    border-radius: 1px;
+
+    color: #303030; /*  border color */
+    background-color: #161616;
     transition: border 0.1s;
+
 }
 
 input:focus {
@@ -30,13 +39,14 @@ input:focus {
 
 button {
     display: block;
-    margin: 20px auto;
+    margin: 10px;  /* Adjust margin as per your requirements */
+    width: 200px;  /* Set a fixed width */
+    height: 0px;  /* Set a fixed height */
     padding: 15px 35px;
-    font-size: 15px;
+    font-size: 12px;
     background-color: #2B6DE8;
     border: none;
     border-radius: 100px;
-    
     cursor: pointer;
     transition: background-color 0.1s;
     font-family: 'Roboto', sans-serif;
@@ -48,8 +58,7 @@ button:hover {
     background-color: #205ab3; 
 }
 
-
 label {
     margin: 15px;
-    display: block;
+    display: none;
 }

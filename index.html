@@ -9,37 +9,30 @@
 		<script src="./lib/CSInterface.js" defer></script>		
 		<script src="./src/videoDownloader.js" defer></script>	
 		<script type="text/javascript">
-
 			function runAll() {
 				var youtubeLink = document.getElementById('youtubeLink').value;
-				// alert('Received link: ' + youtubeLink);
-				
-				// Call the downloadVideo function from videoDownloader.js
 				downloadVideo(youtubeLink, function(error, filepaths) {
 					if (error) {
 						console.log('Error downloading: ' + error.message);
 						return;
 					}
-					
 					console.log(`Downloaded videos saved`);
-
-					// Add any code to import the video into Premiere Pro or perform other tasks.
 				});
 			}
-
 		</script>
 	</head>
 
 	<body>
-		<label for="youtubeLink">Enter YouTube Link:</label>
-		<input type="text" id="youtubeLink" placeholder="Paste YouTube link here">
-		<button id="runButton" type="run" onclick="runAll()">Download and Import</button> 
+		<div class="container">
+			<input type="text" id="youtubeLink" placeholder="Paste YouTube link here">
+			<button id="runButton" type="run" onclick="runAll()">Download and Import</button> 
 
-		<!-- Progress bar -->
-		<div id="progressContainer" style="display: none;">
-			<progress id="progressBar" max="100" value="0"></progress>
-			<span id="statusMessage">Downloading...</span>
+			<!-- Progress bar -->
+			<div id="progressContainer" style="display: none;">
+				<progress id="progressBar" max="100" value="0"></progress>
+				<span id="statusMessage">Downloading...</span>
+			</div>
 		</div>
 	</body>
-	
 </html>
+
