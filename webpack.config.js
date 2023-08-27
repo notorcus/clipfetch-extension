@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './src/components/index.js',
+  entry: './src/index.tsx',
   mode: "development",
   output: {
     path: path.join(__dirname, 'dist'),
@@ -11,6 +11,11 @@ module.exports = {
   },
   module: {
     rules: [
+      {
+        test: /\.(ts|tsx)$/,
+        exclude: /node_modules/,
+        use: 'ts-loader'
+      },
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
@@ -29,13 +34,13 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin()
   ],
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx', '.ts', '.tsx']
   },
   devServer: {
     static: {
       directory: path.join(__dirname),
     },
-    host: 'localhost',  // This ensures we're binding to localhost
+    host: 'localhost',
     allowedHosts: 'all',
     client: {
         webSocketURL: 'ws://localhost:9000/ws',
