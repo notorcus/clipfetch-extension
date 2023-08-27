@@ -1,7 +1,8 @@
 .link-input-container {
-  width: 300px;
-  padding: 10px;
+  width: 100%;
+  padding: 20px;
   box-sizing: border-box;
+  border-bottom: 2px solid #313131;
 }
 
 .link-input-field {
@@ -13,7 +14,7 @@
   color: rgb(200, 200, 200); /* Text color */
   box-sizing: border-box;
   outline: none; 
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .link-input-field:focus {
@@ -21,5 +22,4 @@
   color: black;
   border: 1px solid #1473E6;  /* Update this line */
   outline: none;  /* Add this line */
-  font-size: 12px;
 }

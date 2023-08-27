@@ -1,5 +1,8 @@
 body, button, input, textarea {
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
-  }
-  
+}
+
+.main-container {
+    width: 100%;
+}
