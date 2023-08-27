@@ -2,7 +2,7 @@
 <ExtensionList>
     <Extension Id="com.notorcus.creators-toolkit.clipfetch">
         <HostList>
-            <Host Name="PPRO" Port="8708"/>
+            <Host Name="PPRO" Port="8800"/>
         </HostList>
     </Extension>
 </ExtensionList>
