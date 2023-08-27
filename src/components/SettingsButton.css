@@ -1,0 +1,10 @@
+.settings-button {
+    width: 36px;  /* Width should be the same as height */
+    height: 36px; /* Height should be the same as the toggle button */
+    background-color: #161616;
+    border: 1px solid #313131;
+    color: white;
+    cursor: pointer;
+    margin-left: 5px;
+  }
+  

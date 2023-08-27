@@ -1,7 +1,16 @@
+.toggle-button-container {
+    display: flex;
+    align-items: center;  /* This should align items vertically */
+    height: 36px;  /* Set a fixed height */
+    margin-top: 10px;
+  }
+  
+
 .toggle-button {
+    flex-grow: 1;
+    height: 36px;
     width: 100%;
     padding: 7px;
-    margin-top: 10px;
     border: 1px solid #313131;
     background-color: #1D1D1D;
     color: rgb(175, 175, 175); /* Text color */
@@ -20,5 +29,4 @@
     background-color: #075687;
     border: 1px solid #00000000;
 }
-  
   
