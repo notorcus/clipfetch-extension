@@ -1,10 +1,18 @@
 import React from 'react';
 import './DownloadButton.css';
 
-const DownloadButton: React.FC = () => {
+interface DownloadButtonProps {
+  inputValue: string;
+}
+
+const DownloadButton: React.FC<DownloadButtonProps> = ({ inputValue }) => {
 
   const initiateDownload = () => {
-    console.log("Download button clicked.");
+    if (inputValue === '') {
+      console.log("Input field is empty.");
+    } else {
+      console.log("Download button clicked. Input value:", inputValue);
+    }
   };
 
   return (
