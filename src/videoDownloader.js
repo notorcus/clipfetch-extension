@@ -27,7 +27,7 @@ function downloadStream(format, outputPath, link) {
         });
 
         ytDlp.on('close', (code) => {
-            // console.log("yt-dlp output:", outputData);
+            console.log("yt-dlp output:", outputData);
             if (code !== 0) {
                 console.log("Error output:", errorData);
                 reject(new Error(errorData));
