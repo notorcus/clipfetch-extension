@@ -1,10 +1,10 @@
-// App.tsx
-import React from 'react';
+import './index.css';  // Add this line
+import LinkInput from './components/LinkInput';
 
 function App() {
   return (
     <div>
-      <h1>Hello from Akki!</h1>
+      <LinkInput />
     </div>
   );
 }

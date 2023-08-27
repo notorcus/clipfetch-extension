@@ -1,0 +1,25 @@
+.link-input-container {
+  width: 300px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.link-input-field {
+  width: 100%;
+  border-radius: 2.5px;
+  padding: 8px;
+  border: 1px solid #313131;
+  background-color: #161616;
+  color: rgb(200, 200, 200); /* Text color */
+  box-sizing: border-box;
+  outline: none; 
+  font-size: 12px;
+}
+
+.link-input-field:focus {
+  background-color: white;
+  color: black;
+  border: 1px solid #1473E6;  /* Update this line */
+  outline: none;  /* Add this line */
+  font-size: 12px;
+}
