@@ -1,8 +1,10 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: './src/components/index.js',
+  mode: "development",
   output: {
     path: path.join(__dirname, 'dist'),
     filename: 'bundle.js'
@@ -23,16 +25,26 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './public/index.html'
-    })
+    }),
+    new webpack.HotModuleReplacementPlugin()
   ],
   resolve: {
     extensions: ['.js', '.jsx']
   },
   devServer: {
     static: {
-        directory: path.join(__dirname, 'dist'),
+      directory: path.join(__dirname),
+    },
+    host: 'localhost',  // This ensures we're binding to localhost
+    allowedHosts: 'all',
+    client: {
+        webSocketURL: 'ws://localhost:9000/ws',
     },
     compress: true,
-    port: 9000
+    port: 9000,
+    hot: true,
+    headers: {
+      "Access-Control-Allow-Origin": "*"
+    },
   }
 };
