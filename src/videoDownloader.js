@@ -1,70 +1,130 @@
-const youtubedl = require('youtube-dl-exec');
-const path = require('path');
+const { spawn } = require('child_process');
+const { exec } = require('child_process');
 
-const updateProgressBar = (value) => {
-    const progressBar = document.getElementById('progressBar');
-    const statusMessage = document.getElementById('statusMessage');
-    progressBar.value = value;
-    statusMessage.innerText = `Downloading... ${value}%`;
-};
+function downloadStream(format, outputPath, link) {
+    return new Promise((resolve, reject) => {
+        const ytDlpPath = "C:\\Users\\Akshat Kumar\\AppData\\Roaming\\Python\\Python311\\Scripts\\yt-dlp.exe";
+        const filename = `${outputPath}%(title)s_${format}.%(ext)s`;
 
-const showProgressBar = () => {
-    const progressContainer = document.getElementById('progressContainer');
-    progressContainer.style.display = 'block';
-};
+        let args;
+        if (format === 'video') {
+            args = ['-f', 'bestvideo[acodec=none]', '-o', filename, link];
+        } else {
+            args = ['-f', 'bestaudio[vcodec=none]', '-o', filename, link];
+        }
 
-const hideProgressBar = () => {
-    const progressContainer = document.getElementById('progressContainer');
-    progressContainer.style.display = 'none';
-};
+        const ytDlp = spawn(ytDlpPath, args);
 
-const downloadAndConvertVideo = async (youtubeLink) => {
-    const cs = new CSInterface;
+        let errorData = '';
+        let outputData = '';
 
-    // Set the output path
-    const outputPath = "C:\\Users\\Akshat Kumar\\Editing\\Media\\PProClipFetch";
-    const videoPath = path.join(outputPath, 'convertedVideo.mp4'); // This is where the video will be saved
-
-    showProgressBar();
-    alert('Started download and conversion for: ' + youtubeLink); // Alert after starting the download
-
-    try {
-        // Simulated progress bar update
-        let progress = 0;
-        const interval = setInterval(() => {
-            if (progress < 100) {
-                progress += 5;  // Increment by 5%
-                updateProgressBar(progress);
-            } else {
-                clearInterval(interval);
-                hideProgressBar();
-            }
-        }, 1000);  // Update every second
-
-        await youtubedl(youtubeLink, {
-            'output': videoPath,
-            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best',
-            'postprocessor-args': '-c:v libx264 -preset fast',
-            'merge-output-format': 'mp4',
-            'no-check-certificate': true,
-            'no-warnings': true,
-            'prefer-free-formats': true,
-            'add-header': [
-                'referer:youtube.com',
-                'user-agent:googlebot'
-            ]
+        ytDlp.stderr.on('data', (data) => {
+            errorData += data;
         });
 
-        clearInterval(interval);
-        updateProgressBar(100);
-        hideProgressBar();
-        alert('Download and conversion complete!');
-    } catch (error) {
-        clearInterval(interval);
-        hideProgressBar();
-        console.error('Error during download or conversion:', error);
-        alert('Error processing video. Please try again.');
-    }
+        ytDlp.stdout.on('data', (data) => {
+            outputData += data;
+        });
+
+        ytDlp.on('close', (code) => {
+            // console.log("yt-dlp output:", outputData);
+            if (code !== 0) {
+                console.log("Error output:", errorData);
+                reject(new Error(errorData));
+            } else {
+                // Parse the output to get the filename
+                const lines = outputData.split('\n');
+                let downloadedFilePath;
+
+                for (const line of lines) {
+                    if (line.startsWith('[download] C:\\')) {
+                        downloadedFilePath = line.replace('[download] ', '').split(' has already been downloaded')[0].trim();
+                        if (downloadedFilePath.endsWith('% of    3.83MiB')) {
+                            downloadedFilePath = downloadedFilePath.replace(' 100% of    3.83MiB', '').trim();
+                        }
+                        break;
+                    }
+                }
+
+                if (downloadedFilePath) {
+                    resolve(downloadedFilePath);
+                } else {
+                    reject(new Error("Couldn't parse the filename from yt-dlp output."));
+                }
+            }
+        });
+    });
 }
 
-window.downloadAndConvertVideo = downloadAndConvertVideo;
+function checkNvencSupport(callback) {
+    exec('ffmpeg -encoders | find "nvenc"', (error, stdout, stderr) => {
+        if (stdout.includes("nvenc")) {
+            callback(true);
+        } else {
+            callback(false);
+        }
+    });
+}
+
+function mergeStreams(videoFile, audioFile, outputPath) {
+    return new Promise((resolve, reject) => {
+        // Extract title from videoFile using regex
+        const titleMatch = videoFile.match(/([^\\]+)_(?:video|audio)\.\w+$/);
+        if (!titleMatch) {
+            reject(new Error("Couldn't parse the title from the video file path."));
+            return;
+        }
+        const title = titleMatch[1];
+        const mergedFilename = `${outputPath}${title}.mp4`; 
+
+        const ffmpegPath = "ffmpeg";
+
+        checkNvencSupport((supportsNvenc) => {
+            let args;
+            
+            if (supportsNvenc) {
+                console.log("Using NVENC for encoding.");
+                args = ['-y', '-i', videoFile, '-i', audioFile, '-c:v', 'h264_nvenc', '-preset', 'fast', '-c:a', 'aac', '-strict', 'experimental', '-f', 'mp4', mergedFilename];
+            } else {
+                console.log("Using libx264 for encoding.");
+                args = ['-y', '-i', videoFile, '-i', audioFile, '-c:v', 'libx264', '-preset', 'fast', '-c:a', 'aac', '-strict', 'experimental', '-f', 'mp4', mergedFilename];
+            }
+
+            const ffmpeg = spawn(ffmpegPath, args);
+
+            let errorData = '';
+            ffmpeg.stderr.on('data', (data) => {
+                errorData += data;
+            });
+
+            ffmpeg.on('close', (code) => {
+                if (code !== 0) {
+                    console.log("Error output:", errorData);
+                    reject(new Error(errorData));
+                } else {
+                    resolve(mergedFilename);
+                }
+            });
+        });
+    });
+}
+
+
+
+function downloadVideo(link, callback) {
+    const outputPath = 'C:\\Users\\Akshat Kumar\\Editing\\Media\\PProClipFetch\\';
+
+    Promise.all([
+        downloadStream('video', outputPath, link),
+        downloadStream('audio', outputPath, link)
+    ]).then(([videoFile, audioFile]) => {
+        console.log("Starting conversion...");
+        return mergeStreams(videoFile, audioFile, outputPath);
+    }).then(mergedFile => {
+        callback(null, mergedFile);
+    }).catch(error => {
+        callback(error);
+    });
+}
+
+module.exports = { downloadVideo };
