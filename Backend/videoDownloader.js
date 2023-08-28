@@ -1,3 +1,5 @@
+// videoDownloader.js
+
 const { spawn } = require('child_process');
 const { exec } = require('child_process');
 
@@ -27,7 +29,7 @@ function downloadStream(format, outputPath, link) {
         });
 
         ytDlp.on('close', (code) => {
-            console.log("yt-dlp output:", outputData);
+            // console.log("yt-dlp output:", outputData);
             if (code !== 0) {
                 console.log("Error output:", errorData);
                 reject(new Error(errorData));
@@ -35,17 +37,21 @@ function downloadStream(format, outputPath, link) {
                 // Parse the output to get the filename
                 const lines = outputData.split('\n');
                 let downloadedFilePath;
-
+        
                 for (const line of lines) {
-                    if (line.startsWith('[download] C:\\')) {
-                        downloadedFilePath = line.replace('[download] ', '').split(' has already been downloaded')[0].trim();
-                        if (downloadedFilePath.endsWith('% of    3.83MiB')) {
-                            downloadedFilePath = downloadedFilePath.replace(' 100% of    3.83MiB', '').trim();
+                    if (line.startsWith('[download]')) {
+                        const destinationMatch = line.match(/Destination: (.+)$/);
+                        if (destinationMatch) {
+                            // Extract the file path that comes after "Destination:"
+                            downloadedFilePath = destinationMatch[1].trim();
+                        } else {
+                            // Extract the file path that starts after "[download] "
+                            downloadedFilePath = line.replace('[download] ', '').split(' has already been downloaded')[0].trim();
                         }
                         break;
                     }
                 }
-
+        
                 if (downloadedFilePath) {
                     resolve(downloadedFilePath);
                 } else {
@@ -53,6 +59,7 @@ function downloadStream(format, outputPath, link) {
                 }
             }
         });
+        
     });
 }
 

@@ -9,6 +9,9 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
     filename: 'bundle.js'
   },
+  externals: {
+    'child_process': 'commonjs child_process',
+  },
   module: {
     rules: [
       {
