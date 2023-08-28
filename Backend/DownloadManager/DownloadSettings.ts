@@ -1,24 +1,27 @@
 // Define the structure for settings
 interface DownloadSettings {
     output_path: string;
-    combined: FileSettings;
-    video_only: FileSettings;
+    combined: CombinedFileSettings;
+    video_only: VideoFileSettings;
     audio_only: AudioFileSettings;
   }
   
-  interface FileSettings {
+  interface BaseFileSettings {
     enabled: boolean;
     codec: string;
     container: string;
     bitrate: string;
+  }
+  
+  interface VideoFileSettings extends BaseFileSettings {
     dimensions: string;
   }
   
-  interface AudioFileSettings {
-    enabled: boolean;
-    codec: string;
-    container: string;
-    bitrate: string;
+  interface AudioFileSettings extends BaseFileSettings {}
+  
+  // CombinedFileSettings includes both Video and Audio settings
+  interface CombinedFileSettings extends BaseFileSettings {
+    dimensions: string;
   }
   
   // Default settings
