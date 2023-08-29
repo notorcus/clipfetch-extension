@@ -16,9 +16,9 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({ inputValue, isVideoActi
       console.log("Input field is empty.");
     } else {
       console.log("Download button clicked. Input value:", inputValue);
-      console.log("Video Active:", isVideoActive);
-      console.log("Audio Active:", isAudioActive);
-      console.log("Combined Active:", isCombinedActive);
+      // console.log("Combined Active:", isCombinedActive);
+      // console.log("Video Active:", isVideoActive);
+      // console.log("Audio Active:", isAudioActive);
 
       // Update your DownloadSettings here based on the toggle states
       // ...

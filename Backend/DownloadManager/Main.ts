@@ -29,13 +29,9 @@ export const initiateDownload = (
   const videoSettings = getSetting('video_only');
   const audioSettings = getSetting('audio_only');
 
-  // Log for testing
-  console.log('Combined settings:', combinedSettings);
-  console.log('Video settings:', videoSettings);
-  console.log('Audio settings:', audioSettings);
-
   // Download logic based on settings
   if (combinedSettings.enabled) {
+    console.log('Combined settings:', combinedSettings);
     console.log('Initiating combined download...');
     downloadCombined(url);
     if (!isVideoActive) {
@@ -51,16 +47,15 @@ export const initiateDownload = (
   // If combined is not enabled, then proceed with individual downloads
   if (!isCombinedActive) {
     if (isVideoActive) {
+      console.log('Video settings:', videoSettings);
       console.log('Initiating video download...');
       downloadVideo(url);
     }
 
     if (isAudioActive) {
+      console.log('Audio settings:', audioSettings);
       console.log('Initiating audio download...');
       downloadAudio(url);
     }
   }
-
-  // You can also call the callback here to indicate success/failure
-  // e.g., callback(null, "Download initiated");
 };
