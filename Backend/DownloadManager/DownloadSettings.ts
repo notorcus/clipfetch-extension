@@ -1,4 +1,4 @@
-// Define the structure for settings
+// DownloadSettings.ts
 interface DownloadSettings {
     output_path: string;
     combined: CombinedFileSettings;

@@ -1,4 +1,4 @@
-import { getSetting } from './DownloadSettings';
+// DownloadUtils.ts
 
 // Function to check if NVENC is supported and enabled
 const checkNvencSupport = (): boolean => {
@@ -9,31 +9,22 @@ const checkNvencSupport = (): boolean => {
 
 // Function to download video
 const downloadVideo = (url: string): void => {
-  const settings = getSetting('video_only');
-  if (settings.enabled) {
-    // Implement download logic here
-    console.log('Downloading video.');
-  }
+  // Implement download logic here
+  console.log('Downloading video.');
 };
 
 // Function to download audio
 const downloadAudio = (url: string): void => {
-  const settings = getSetting('audio_only');
-  if (settings.enabled) {
-    // Implement download logic here
-    console.log('Downloading audio.');
-  }
+  // Implement download logic here
+  console.log('Downloading audio.');
 };
 
 // Function to download combined audio and video
 const downloadCombined = (url: string): void => {
-  const settings = getSetting('combined');
-  if (settings.enabled) {
-    // Implement download logic here
-    downloadVideo(url);
-    downloadAudio(url);
-    console.log('Combining audio and video.');
-  }
+  // Implement download logic here
+  downloadVideo(url);
+  downloadAudio(url);
+  console.log('Combining audio and video.');
 };
 
 // Export the initiateDownload function

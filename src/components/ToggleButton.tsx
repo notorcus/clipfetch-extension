@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
+// ToggleButton.tsx
+import React from 'react';
 import './ToggleButton.css';
-import SettingsButton from './SettingsButton';  // Import the new component
+import SettingsButton from './SettingsButton';
 
 interface ToggleButtonProps {
   label: string;
   id: string;
   settingsRoute: string;
+  isActive: boolean;
+  onToggle: (isActive: boolean) => void;
 }
 
-const ToggleButton: React.FC<ToggleButtonProps> = ({ label, id, settingsRoute }) => {
-  const [isActive, setIsActive] = useState(false);
-
+const ToggleButton: React.FC<ToggleButtonProps> = ({ label, id, settingsRoute, isActive, onToggle }) => {
   const toggleButton = () => {
-    setIsActive(!isActive);
+    onToggle(!isActive);
   };
 
   return (
