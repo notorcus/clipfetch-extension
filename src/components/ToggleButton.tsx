@@ -25,7 +25,7 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({ label, id, settingsRoute, i
       >
         {label}
       </button>
-      <SettingsButton route={settingsRoute} />
+      <SettingsButton route={settingsRoute} isActive={isActive} />
     </div>
   );
 };
