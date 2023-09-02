@@ -39,39 +39,62 @@ const downloadStream = (format: 'video' | 'audio', outputPath: string, link: str
   });
 };
 
-const downloadVideo = async (url: string): Promise<void> => {
+const downloadVideo = async (url: string): Promise<string> => {
   try {
     const outputPath = getSetting('output_path');
     const outputData = await downloadStream('video', outputPath, url);
-
     const downloadedFilePath = parseOutputData(outputData);
     if (downloadedFilePath) {
       console.log("Video downloaded successfully:", downloadedFilePath);
+      return downloadedFilePath;
+    } else {
+      throw new Error("Failed to get the video file path");
     }
   } catch (error) {
     console.error("Failed to download video:", error);
+    throw error;
   }
 };
 
-const downloadAudio = async (url: string): Promise<void> => {
+const downloadAudio = async (url: string): Promise<string> => {
   try {
     const outputPath = getSetting('output_path');
     const outputData = await downloadStream('audio', outputPath, url);
-
     const downloadedFilePath = parseOutputData(outputData);
     if (downloadedFilePath) {
       console.log("Audio downloaded successfully:", downloadedFilePath);
+      return downloadedFilePath;
+    } else {
+      throw new Error("Failed to get the audio file path");
     }
   } catch (error) {
     console.error("Failed to download audio:", error);
+    throw error;
   }
 };
 
-const downloadCombined = (url: string): void => {
-  // Implement download logic here
-  downloadVideo(url);
-  downloadAudio(url);
-  console.log('Combining audio and video.');
+const downloadCombined = async (url: string): Promise<void> => {
+  try {
+    // Get the output path from settings
+    const outputPath = getSetting('output_path');
+    
+    // Download video and audio
+    const videoFile = await downloadVideo(url);
+    const audioFile = await downloadAudio(url);
+
+    // Log for testing
+    console.log(`Video File: ${videoFile}`);
+    console.log(`Audio File: ${audioFile}`);
+
+    // Merge video and audio
+    const mergedFile = await mergeStreams(videoFile, audioFile, outputPath);
+
+    // Log the path of the merged file
+    console.log(`Merged File: ${mergedFile}`);
+
+  } catch (error) {
+    console.error('Error in downloadCombined:', error);
+  }
 };
 
 const parseOutputData = (outputData: string): string | null => {
@@ -98,6 +121,49 @@ const parseOutputData = (outputData: string): string | null => {
   }
 
   return downloadedFilePath;
+};
+
+const mergeStreams = (
+  videoFile: string, 
+  audioFile: string, 
+  outputPath: string
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    // Extract title from videoFile using regex
+    const titleMatch = videoFile.match(/([^\\]+)_(?:video|audio)\.\w+$/);
+    if (!titleMatch) {
+      reject(new Error("Couldn't parse the title from the video file path."));
+      return;
+    }
+    const title = titleMatch[1];
+    const mergedFilename = `${outputPath}${title}.mp4`;
+
+    // For now, we'll assume NVENC support is true for faster development
+    const supportsNvenc = true;  
+    let args;
+    
+    const videoCodec = supportsNvenc ? 'h264_nvenc' : 'libx264';
+
+    console.log(`Using ${videoCodec} for encoding.`);
+    
+    args = ['-y', '-i', videoFile, '-i', audioFile, '-c:v', videoCodec, '-preset', 'fast', '-c:a', 'aac', '-strict', 'experimental', '-f', 'mp4', mergedFilename];    
+
+    const ffmpeg = spawn('ffmpeg', args);
+
+    let errorData = '';
+    ffmpeg.stderr.on('data', (data) => {
+      errorData += data;
+    });
+
+    ffmpeg.on('close', (code) => {
+      if (code !== 0) {
+        console.log("Error output:", errorData);
+        reject(new Error(errorData));
+      } else {
+        resolve(mergedFilename);
+      }
+    });
+  });
 };
 
 const checkNvencSupport = (): boolean => {
