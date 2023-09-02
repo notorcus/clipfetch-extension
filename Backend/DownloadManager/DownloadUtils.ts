@@ -1,5 +1,6 @@
 // DownloadUtils.ts
 import { spawn } from 'child_process';
+import { getSetting } from './DownloadSettings';
 
 const downloadStream = (format: 'video' | 'audio', outputPath: string, link: string): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -40,7 +41,7 @@ const downloadStream = (format: 'video' | 'audio', outputPath: string, link: str
 
 const downloadVideo = async (url: string): Promise<void> => {
   try {
-    const outputPath = 'C:\\Users\\Akshat Kumar\\Editing\\Media\\PProClipFetch\\';
+    const outputPath = getSetting('output_path');
     const outputData = await downloadStream('video', outputPath, url);
     console.log("Video downloaded successfully:", outputData);
   } catch (error) {
@@ -50,7 +51,7 @@ const downloadVideo = async (url: string): Promise<void> => {
 
 const downloadAudio = async (url: string): Promise<void> => {
   try {
-    const outputPath = 'C:\\Users\\Akshat Kumar\\Editing\\Media\\PProClipFetch\\';
+    const outputPath = getSetting('output_path');
     const outputData = await downloadStream('audio', outputPath, url);
     console.log("Audio downloaded successfully:", outputData);
   } catch (error) {

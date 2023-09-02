@@ -26,7 +26,7 @@ interface DownloadSettings {
   
   // Default settings
   let downloadSettings: DownloadSettings = {
-    output_path: './downloads/',
+    output_path: 'C:\\Users\\Akshat Kumar\\Editing\\Media\\PProClipFetch\\',
     combined: {
       enabled: true,
       codec: 'h264',
