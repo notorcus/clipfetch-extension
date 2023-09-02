@@ -43,7 +43,11 @@ const downloadVideo = async (url: string): Promise<void> => {
   try {
     const outputPath = getSetting('output_path');
     const outputData = await downloadStream('video', outputPath, url);
-    console.log("Video downloaded successfully:", outputData);
+
+    const downloadedFilePath = parseOutputData(outputData);
+    if (downloadedFilePath) {
+      console.log("Video downloaded successfully:", downloadedFilePath);
+    }
   } catch (error) {
     console.error("Failed to download video:", error);
   }
@@ -53,17 +57,47 @@ const downloadAudio = async (url: string): Promise<void> => {
   try {
     const outputPath = getSetting('output_path');
     const outputData = await downloadStream('audio', outputPath, url);
-    console.log("Audio downloaded successfully:", outputData);
+
+    const downloadedFilePath = parseOutputData(outputData);
+    if (downloadedFilePath) {
+      console.log("Audio downloaded successfully:", downloadedFilePath);
+    }
   } catch (error) {
     console.error("Failed to download audio:", error);
   }
-}
+};
 
 const downloadCombined = (url: string): void => {
   // Implement download logic here
   downloadVideo(url);
   downloadAudio(url);
   console.log('Combining audio and video.');
+};
+
+const parseOutputData = (outputData: string): string | null => {
+  const lines = outputData.split('\n');
+  let downloadedFilePath: string | null = null;
+
+  for (const line of lines) {
+    if (line.startsWith('[download]')) {
+      const destinationMatch = line.match(/Destination: (.+)$/);
+      if (destinationMatch) {
+        // Extract the file path that comes after "Destination:"
+        downloadedFilePath = destinationMatch[1].trim();
+      } else {
+        // Extract the file path that starts after "[download] "
+        downloadedFilePath = line.replace('[download] ', '').split(' has already been downloaded')[0].trim();
+      }
+      break;
+    }
+  }
+
+  if (!downloadedFilePath) {
+    console.error("Couldn't parse the filename from yt-dlp output.");
+    return null;
+  }
+
+  return downloadedFilePath;
 };
 
 const checkNvencSupport = (): boolean => {
