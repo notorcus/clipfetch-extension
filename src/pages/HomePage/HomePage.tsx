@@ -21,10 +21,12 @@ const HomePage: React.FC = () => {
       <div className="link-input-container">
         <LinkInput onInputChange={handleInputChange} />
       </div>
-      <div className="dropdown-container">
-        <QualityDropdown options={videoOptions} label="Video Quality" />
-        <QualityDropdown options={audioOptions} label="Audio Quality" />
-      </div>
+      {inputValue && (
+        <div className="dropdown-container">
+          <QualityDropdown options={videoOptions} label="Video Quality" />
+          <QualityDropdown options={audioOptions} label="Audio Quality" />
+        </div>
+      )}
       <DownloadButton inputValue={inputValue} />
     </div>
   );  
