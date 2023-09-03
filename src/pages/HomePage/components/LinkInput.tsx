@@ -12,19 +12,16 @@ const LinkInput: React.FC<LinkInputProps> = ({ onInputChange }) => {
     const newValue = e.target.value;
     onInputChange(newValue);
   
-    // Fetch available formats if the input is not empty
-    if (newValue !== '') {
+    if (newValue) {
       getAvailableFormats(newValue, (error, data) => {
         if (error) {
-          console.error("Could not get available formats:", error);
+          console.error("Failed to get available formats:", error);
         } else {
           console.log("Available formats:", data);
-          // Here, you can update some state to populate the dropdown options
         }
       });
     }
   };
-  
 
   return (
     <div className="link-input-container">
@@ -32,7 +29,7 @@ const LinkInput: React.FC<LinkInputProps> = ({ onInputChange }) => {
         type="text" 
         className="link-input-field" 
         placeholder="Enter link..." 
-        onChange={handleInputChange} // Update state on input change
+        onChange={handleInputChange}  // Update state on input change
       />
     </div>
   );

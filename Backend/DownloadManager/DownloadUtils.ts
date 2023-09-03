@@ -2,9 +2,7 @@
 import { spawn } from 'child_process';
 
 export const getAvailableFormats = (url: string, callback: (error: any, data?: any) => void) => {
-  console.log("invoked get format")
-  const ytDlp = spawn('yt-dlp', ['-F', url]);
-
+  const ytDlp = spawn('yt-dlp', ['--dump-json', url]);
   let output = '';
   let errorOutput = '';
 
@@ -18,9 +16,15 @@ export const getAvailableFormats = (url: string, callback: (error: any, data?: a
 
   ytDlp.on('close', (code) => {
     if (code !== 0) {
-      callback(new Error(`yt-dlp process exited with code ${code}: ${errorOutput}`));
-    } else {
-      callback(null, output);
+      return callback(new Error(`yt-dlp failed: ${errorOutput}`));
+    }
+
+    try {
+      const parsedData = JSON.parse(output);
+      const availableFormats = parsedData.formats;  // Assumes that 'formats' is the relevant key
+      callback(null, availableFormats);
+    } catch (err) {
+      callback(err);
     }
   });
 };
