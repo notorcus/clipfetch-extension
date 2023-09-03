@@ -19,8 +19,8 @@
 		<Extension Id="com.notorcus.creators-toolkit.clipfetch">
 			<DispatchInfo >
 				<Resources>
-					<MainPath>./index.html</MainPath>
-					<ScriptPath>./src/extendScript.jsx</ScriptPath>
+					<MainPath>./public/dev.html</MainPath>
+					<ScriptPath>./backend/extendScript.jsx</ScriptPath>
 					<CEFCommandLine>
 						<Parameter>--allow-file-access</Parameter>
 						<Parameter>--allow-file-access-from-files</Parameter>

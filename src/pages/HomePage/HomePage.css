@@ -1,0 +1,36 @@
+/* HomePage.css */
+
+/* Main container */
+.home-page-container {
+  width: 100%;
+  box-sizing: border-box;
+  border-bottom: 2px solid #313131;
+  align-items: center;
+}
+
+/* Container for link input and download button */
+.link-input-download-container {
+  display: flex;
+  align-items: baseline;
+  margin: 20px;
+  margin-top: 0;
+}
+
+.toggle-button-settings-container {  
+  margin: 20px;
+}
+
+.toggle-settings-pair-container {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  /* border: 1px solid aqua; */
+}
+
+.toggle-button {
+  flex-grow: 1; /* Fill the remaining width */
+}
+
+.settings-button {
+  flex-grow: 0; /* Do not grow */
+}
