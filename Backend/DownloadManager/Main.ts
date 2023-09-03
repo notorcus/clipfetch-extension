@@ -1,14 +1,18 @@
 // Main.ts
+
 import {
   downloadVideo,
   downloadAudio,
   downloadCombined,
-  checkNvencSupport
-} from './DownloadUtils';  // Adjust the path as needed
-import { getSetting, updateNestedSetting } from './DownloadSettings';  // Adjust the path as needed
+  checkNvencSupport,
+  deleteFile
+} 
+
+from './DownloadUtils';
+import { getSetting, updateNestedSetting } from './DownloadSettings';
 
 // Function to initiate downloads based on the settings
-export const initiateDownload = (
+export const initiateDownload = async (
   url: string, 
   isVideoActive: boolean, 
   isAudioActive: boolean, 
@@ -33,14 +37,23 @@ export const initiateDownload = (
   if (combinedSettings.enabled) {
     console.log('Combined settings:', combinedSettings);
     console.log('Initiating combined download...');
-    downloadCombined(url);
+
+    // Awaiting the downloadCombined function
+    const { mergedFile, videoFile, audioFile } = await downloadCombined(url);
+
+    const correctedVideoFile = videoFile.replace(/\\/g, '/');
+    const correctedAudioFile = audioFile.replace(/\\/g, '/');
+
     if (!isVideoActive) {
-      // Delete video file if it's not toggled on
-      console.log('Deleting video file...');
+      console.log('Deleting video file...', correctedVideoFile);
+      await deleteFile(correctedVideoFile);
+      console.log("deleteFile called");
     }
+
     if (!isAudioActive) {
-      // Delete audio file if it's not toggled on
-      console.log('Deleting audio file...');
+      console.log('Deleting audio file...', correctedAudioFile);
+      await deleteFile(correctedAudioFile);
+      console.log("deleteFile called");
     }
   }
 

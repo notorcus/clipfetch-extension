@@ -2,6 +2,9 @@
 import { spawn } from 'child_process';
 import { getSetting } from './DownloadSettings';
 
+
+const csInterface = new CSInterface();
+
 const downloadStream = (format: 'video' | 'audio', outputPath: string, link: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     const ytDlpPath = "C:\\Users\\Akshat Kumar\\AppData\\Roaming\\Python\\Python311\\Scripts\\yt-dlp.exe";
@@ -73,54 +76,27 @@ const downloadAudio = async (url: string): Promise<string> => {
   }
 };
 
-const downloadCombined = async (url: string): Promise<void> => {
+const downloadCombined = async (url: string): Promise<{mergedFile: string, videoFile: string, audioFile: string}> => {
   try {
-    // Get the output path from settings
     const outputPath = getSetting('output_path');
     
-    // Download video and audio
     const videoFile = await downloadVideo(url);
     const audioFile = await downloadAudio(url);
 
-    // Log for testing
     console.log(`Video File: ${videoFile}`);
     console.log(`Audio File: ${audioFile}`);
 
-    // Merge video and audio
     const mergedFile = await mergeStreams(videoFile, audioFile, outputPath);
-
-    // Log the path of the merged file
     console.log(`Merged File: ${mergedFile}`);
 
+    return {
+      mergedFile,
+      videoFile,
+      audioFile,
+    };
   } catch (error) {
-    console.error('Error in downloadCombined:', error);
+    throw error;
   }
-};
-
-const parseOutputData = (outputData: string): string | null => {
-  const lines = outputData.split('\n');
-  let downloadedFilePath: string | null = null;
-
-  for (const line of lines) {
-    if (line.startsWith('[download]')) {
-      const destinationMatch = line.match(/Destination: (.+)$/);
-      if (destinationMatch) {
-        // Extract the file path that comes after "Destination:"
-        downloadedFilePath = destinationMatch[1].trim();
-      } else {
-        // Extract the file path that starts after "[download] "
-        downloadedFilePath = line.replace('[download] ', '').split(' has already been downloaded')[0].trim();
-      }
-      break;
-    }
-  }
-
-  if (!downloadedFilePath) {
-    console.error("Couldn't parse the filename from yt-dlp output.");
-    return null;
-  }
-
-  return downloadedFilePath;
 };
 
 const mergeStreams = (
@@ -166,6 +142,42 @@ const mergeStreams = (
   });
 };
 
+function deleteFile(filePath: string) {
+  csInterface.evalScript(`$.runScript.deleteFile("${filePath}")`, function(result: string) {
+      if (result === 'true') {
+          console.log("File deleted successfully");
+      } else {
+          console.log("Failed to delete file");
+      }
+  });
+}
+
+const parseOutputData = (outputData: string): string | null => {
+  const lines = outputData.split('\n');
+  let downloadedFilePath: string | null = null;
+
+  for (const line of lines) {
+    if (line.startsWith('[download]')) {
+      const destinationMatch = line.match(/Destination: (.+)$/);
+      if (destinationMatch) {
+        // Extract the file path that comes after "Destination:"
+        downloadedFilePath = destinationMatch[1].trim();
+      } else {
+        // Extract the file path that starts after "[download] "
+        downloadedFilePath = line.replace('[download] ', '').split(' has already been downloaded')[0].trim();
+      }
+      break;
+    }
+  }
+
+  if (!downloadedFilePath) {
+    console.error("Couldn't parse the filename from yt-dlp output.");
+    return null;
+  }
+
+  return downloadedFilePath;
+};
+
 const checkNvencSupport = (): boolean => {
   // Implement NVENC support checking logic here
   console.log('Checking NVENC support.');
@@ -173,4 +185,4 @@ const checkNvencSupport = (): boolean => {
 };
 
 // Export the initiateDownload function
-export { downloadVideo, downloadAudio, downloadCombined, checkNvencSupport };
+export { downloadVideo, downloadAudio, downloadCombined, checkNvencSupport, deleteFile };
