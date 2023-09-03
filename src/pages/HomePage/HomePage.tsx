@@ -9,11 +9,11 @@ import './HomePage.css';
 const HomePage: React.FC = () => {
   const [inputValue, setInputValue] = useState('');  
   const [videoOptions, setVideoOptions] = useState<{ [resolution: string]: string }>({});
-  const [audioOptions, setAudioOptions] = useState<string[]>([]);
+  const [audioOptions, setAudioOptions] = useState<any[]>([]);
 
   useEffect(() => {
     if (inputValue) {
-      getAvailableFormats(inputValue, (error, bestFormatsByResolution) => {
+      getAvailableFormats(inputValue, (error, bestFormatsByResolution, bestAudioFormats) => {
         if (error) {
           console.error('Failed to get formats:', error);
         } else {
@@ -22,7 +22,9 @@ const HomePage: React.FC = () => {
             videoOpts[resolution] = bestFormatsByResolution[resolution].format_id;
           });
           setVideoOptions(videoOpts);
-          // TODO: Set audioOptions
+
+          // Set audioOptions
+          setAudioOptions(bestAudioFormats.map((format: { friendlyName: any; }) => format.friendlyName));
         }
       });
     }
@@ -40,7 +42,6 @@ const HomePage: React.FC = () => {
       {inputValue && (
         <div className="dropdown-container">
           <QualityDropdown options={Object.keys(videoOptions)} label="Video Quality" />
-          {/* TODO: Pass real audio options */}
           <QualityDropdown options={audioOptions} label="Audio Quality" />
         </div>
       )}

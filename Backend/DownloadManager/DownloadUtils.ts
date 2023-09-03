@@ -1,7 +1,7 @@
 // DownloadUtils.ts
 import { spawn } from 'child_process';
 
-export const getAvailableFormats = (url: string, callback: (error: any, data?: any) => void) => {
+export const getAvailableFormats = (url: string, callback: (error: any, videoData?: any, audioData?: any) => void) => {
   const ytDlp = spawn('yt-dlp', ['--dump-json', url]);
   let output = '';
   let errorOutput = '';
@@ -25,6 +25,7 @@ export const getAvailableFormats = (url: string, callback: (error: any, data?: a
 
       // Group formats by resolution
       const formatsByResolution: { [resolution: string]: any[] } = {};
+      const audioFormats: any[] = [];
       availableFormats.forEach((format: any) => {
         if (format.vcodec !== 'none') {  // Video-only formats
           const resolution = format.resolution || `${format.width}x${format.height}`;
@@ -32,6 +33,8 @@ export const getAvailableFormats = (url: string, callback: (error: any, data?: a
             formatsByResolution[resolution] = [];
           }
           formatsByResolution[resolution].push(format);
+        } else if (format.acodec !== 'none') {  // Audio-only formats
+          audioFormats.push(format);
         }
       });
 
@@ -43,7 +46,15 @@ export const getAvailableFormats = (url: string, callback: (error: any, data?: a
         bestFormatsByResolution[resolution] = formats[0];
       }
 
-      callback(null, bestFormatsByResolution);
+      // Sort audio formats by bitrate
+      audioFormats.sort((a, b) => (b.abr || 0) - (a.abr || 0));
+      const bestAudioFormats = audioFormats.map(format => ({
+        format_id: format.format_id,
+        abr: format.abr,
+        friendlyName: `${format.abr}kbps`,
+      }));
+
+      callback(null, bestFormatsByResolution, bestAudioFormats);
 
     } catch (err) {
       callback(err);
