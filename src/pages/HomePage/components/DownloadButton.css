@@ -1,16 +1,22 @@
 .download-button {
-    height: 31px;
+
     color: white;
     cursor: pointer;
     margin-left: 5px;
-    background-color: #075687;
-    border: 1px solid #075687;
-    transition: ease 0.125s;
+    background-color: #232323;
+    border: 1px solid #cfcfcf;
+    transition: ease 75ms;
+    border-radius: 100px;
     outline: none;
+    padding: 6px;
+    padding-left: 30px;
+    padding-right: 30px;
+    margin: 5px;
 }
 
 .download-button:hover{
-    background-color: #1473E6;
+    color: #232323;
+    background-color: #cfcfcf;
     outline: none;
 }
   

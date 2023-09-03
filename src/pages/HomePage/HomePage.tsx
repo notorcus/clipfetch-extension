@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import LinkInput from './components/LinkInput';
 import DownloadButton from './components/DownloadButton';
-import QualityDropdown from './components/QualityDropdown';
+import CustomDropdown from './components/CustomDropdown';  // Import the custom dropdown
 import './HomePage.css';
 
 const HomePage: React.FC = () => {
@@ -22,7 +22,8 @@ const HomePage: React.FC = () => {
         <LinkInput onInputChange={handleInputChange} />
       </div>
       <div className="dropdown-container">
-        <QualityDropdown videoOptions={videoOptions} audioOptions={audioOptions} />
+        <CustomDropdown options={videoOptions} label="Video Quality" />
+        <CustomDropdown options={audioOptions} label="Audio Quality" />
       </div>
       <DownloadButton inputValue={inputValue} />
     </div>
