@@ -21,8 +21,30 @@ export const getAvailableFormats = (url: string, callback: (error: any, data?: a
 
     try {
       const parsedData = JSON.parse(output);
-      const availableFormats = parsedData.formats;  // Assumes that 'formats' is the relevant key
-      callback(null, availableFormats);
+      const availableFormats = parsedData.formats || [];  // Assumes that 'formats' is the relevant key
+
+      // Group formats by resolution
+      const formatsByResolution: { [resolution: string]: any[] } = {};
+      availableFormats.forEach((format: any) => {
+        if (format.vcodec !== 'none') {  // Video-only formats
+          const resolution = format.resolution || `${format.width}x${format.height}`;
+          if (!formatsByResolution[resolution]) {
+            formatsByResolution[resolution] = [];
+          }
+          formatsByResolution[resolution].push(format);
+        }
+      });
+
+      // Find the best format for each resolution based on vbr and fps
+      const bestFormatsByResolution: { [resolution: string]: any } = {};
+      for (const resolution in formatsByResolution) {
+        const formats = formatsByResolution[resolution];
+        formats.sort((a, b) => (b.vbr || 0) - (a.vbr || 0) || (b.fps || 0) - (a.fps || 0));
+        bestFormatsByResolution[resolution] = formats[0];
+      }
+
+      callback(null, bestFormatsByResolution);
+
     } catch (err) {
       callback(err);
     }

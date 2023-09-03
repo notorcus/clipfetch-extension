@@ -1,16 +1,32 @@
 // HomePage.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LinkInput from './components/LinkInput';
 import DownloadButton from './components/DownloadButton';
 import QualityDropdown from './components/QualityDropdown';
+import { getAvailableFormats } from '../../../backend/DownloadManager/DownloadUtils';
 import './HomePage.css';
 
 const HomePage: React.FC = () => {
   const [inputValue, setInputValue] = useState('');  
+  const [videoOptions, setVideoOptions] = useState<{ [resolution: string]: string }>({});
+  const [audioOptions, setAudioOptions] = useState<string[]>([]);
 
-  // Dummy options for testing
-  const videoOptions = ['none', '1440p', '1080p', '720p', '480p', '360p', '240p', '144p'];
-  const audioOptions = ['none', '320kbps', '256kbps', '192kbps'];
+  useEffect(() => {
+    if (inputValue) {
+      getAvailableFormats(inputValue, (error, bestFormatsByResolution) => {
+        if (error) {
+          console.error('Failed to get formats:', error);
+        } else {
+          const videoOpts: { [resolution: string]: string } = {};
+          Object.keys(bestFormatsByResolution).forEach(resolution => {
+            videoOpts[resolution] = bestFormatsByResolution[resolution].format_id;
+          });
+          setVideoOptions(videoOpts);
+          // TODO: Set audioOptions
+        }
+      });
+    }
+  }, [inputValue]);
 
   const handleInputChange = (newValue: string) => {
     setInputValue(newValue);
@@ -23,7 +39,8 @@ const HomePage: React.FC = () => {
       </div>
       {inputValue && (
         <div className="dropdown-container">
-          <QualityDropdown options={videoOptions} label="Video Quality" />
+          <QualityDropdown options={Object.keys(videoOptions)} label="Video Quality" />
+          {/* TODO: Pass real audio options */}
           <QualityDropdown options={audioOptions} label="Audio Quality" />
         </div>
       )}
