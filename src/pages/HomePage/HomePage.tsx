@@ -1,66 +1,32 @@
+// HomePage.tsx
 import React, { useState } from 'react';
 import LinkInput from './components/LinkInput';
-import ToggleButton from './components/ToggleButton';
 import DownloadButton from './components/DownloadButton';
-import './HomePage.css';  // Make sure to create and update your CSS file
+import QualityDropdown from './components/QualityDropdown';
+import './HomePage.css';
 
 const HomePage: React.FC = () => {
-  const [inputValue, setInputValue] = useState('');  // React state to store the input value
-  const [isVideoActive, setIsVideoActive] = useState(false);
-  const [isAudioActive, setIsAudioActive] = useState(false);
-  const [isCombinedActive, setIsCombinedActive] = useState(false);
+  const [inputValue, setInputValue] = useState('');  
+
+  // Dummy options for testing
+  const videoOptions = ['none', '1440p', '1080p', '720p', '480p', '360p', '240p', '144p'];
+  const audioOptions = ['none', '320kbps', '256kbps', '192kbps'];
 
   const handleInputChange = (newValue: string) => {
     setInputValue(newValue);
   };
 
-  const handleToggle = (type: string, isActive: boolean) => {
-    if (type === 'video') setIsVideoActive(isActive);
-    if (type === 'audio') setIsAudioActive(isActive);
-    if (type === 'combined') setIsCombinedActive(isActive);
-  };
-
   return (
     <div className="home-page-container">
-      {/* Global Wrapper Container */}
-      <div className="global-wrapper">
-        {/* Container for LinkInput and DownloadButton */}
-        <div className="link-input-download-container">
-          <LinkInput onInputChange={handleInputChange} />
-          <DownloadButton 
-            inputValue={inputValue} 
-            isVideoActive={isVideoActive} 
-            isAudioActive={isAudioActive} 
-            isCombinedActive={isCombinedActive} 
-          />
-        </div>
-        {/* Container for ToggleButtons and their SettingsButtons */}
-        <div className="toggle-button-settings-container">
-          <ToggleButton 
-            label="Combined" 
-            id="ToggleCombinedButton" 
-            settingsRoute="/settings/combined" 
-            isActive={isCombinedActive} 
-            onToggle={(isActive) => handleToggle('combined', isActive)} 
-          />
-          <ToggleButton 
-            label="Video Only" 
-            id="ToggleVideoOnlyButton" 
-            settingsRoute="/settings/video-only" 
-            isActive={isVideoActive} 
-            onToggle={(isActive) => handleToggle('video', isActive)} 
-          />
-          <ToggleButton 
-            label="Audio Only" 
-            id="ToggleAudioOnlyButton" 
-            settingsRoute="/settings/audio-only" 
-            isActive={isAudioActive} 
-            onToggle={(isActive) => handleToggle('audio', isActive)} 
-          />
-        </div>
+      <div className="link-input-container">
+        <LinkInput onInputChange={handleInputChange} />
       </div>
+      <div className="dropdown-container">
+        <QualityDropdown videoOptions={videoOptions} audioOptions={audioOptions} />
+      </div>
+      <DownloadButton inputValue={inputValue} />
     </div>
-  );
+  );  
 };
 
 export default HomePage;

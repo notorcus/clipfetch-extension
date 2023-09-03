@@ -1,0 +1,31 @@
+/* QualityDropdown.css */
+
+.quality-dropdown-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.quality-dropdown {
+  width: 100%;
+  background-color: #1D1D1D;
+  color: rgb(235, 235, 235);
+  border: none;
+  margin: 10px;
+  padding: 6px;
+  outline: none; /* Remove default focus outline */
+  border: 1px solid #313131;
+}
+
+.quality-dropdown:focus {
+  border: 1px solid #313131;
+}
+
+.quality-dropdown option {
+  background-color: #1D1D1D;
+  color: rgb(235, 235, 235);
+}
+
+.quality-dropdown option:hover,
+.quality-dropdown option:focus {
+  background-color: #232323;
+}
