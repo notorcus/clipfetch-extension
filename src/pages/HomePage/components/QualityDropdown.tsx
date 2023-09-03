@@ -1,13 +1,13 @@
-// CustomDropdown.tsx
+// QualityDropdown.tsx
 import React, { useState } from 'react';
 import './QualityDropdown.css';
 
-interface CustomDropdownProps {
+interface QualityDropdownProps {
   options: string[];
-  label: string; // Add this line
+  label: string;
 }
 
-const CustomDropdown: React.FC<CustomDropdownProps> = ({ options, label }) => {
+const QualityDropdown: React.FC<QualityDropdownProps> = ({ options, label }) => {
   const [selectedOption, setSelectedOption] = useState(options[0]);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -17,7 +17,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ options, label }) => {
   };
 
   return (
-    <div className="custom-dropdown-container" tabIndex={0} onBlur={() => setIsOpen(false)}>
+    <div className="Quality-dropdown-container" tabIndex={0} onBlur={() => setIsOpen(false)}>
       <div className="selected-option" onClick={() => setIsOpen(!isOpen)}>
         <span>{label}: {selectedOption}</span>
         <span className="arrow down"></span>
@@ -39,4 +39,4 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ options, label }) => {
   );
 };
 
-export default CustomDropdown;
+export default QualityDropdown;
