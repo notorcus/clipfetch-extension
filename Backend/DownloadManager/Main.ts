@@ -5,7 +5,8 @@ import {
   downloadAudio,
   downloadCombined,
   checkNvencSupport,
-  deleteFile
+  deleteFile,
+  importFile
 } 
 
 from './DownloadUtils';
@@ -41,19 +42,26 @@ export const initiateDownload = async (
     // Awaiting the downloadCombined function
     const { mergedFile, videoFile, audioFile } = await downloadCombined(url);
 
+    const correctedMergedFile = mergedFile.replace(/\\/g, '/');
     const correctedVideoFile = videoFile.replace(/\\/g, '/');
     const correctedAudioFile = audioFile.replace(/\\/g, '/');
+
+    importFile(correctedMergedFile)
 
     if (!isVideoActive) {
       console.log('Deleting video file...', correctedVideoFile);
       await deleteFile(correctedVideoFile);
       console.log("deleteFile called");
+    } else {
+      importFile(correctedVideoFile)
     }
 
     if (!isAudioActive) {
       console.log('Deleting audio file...', correctedAudioFile);
       await deleteFile(correctedAudioFile);
       console.log("deleteFile called");
+    } else {
+      importFile(correctedAudioFile)
     }
   }
 

@@ -152,6 +152,17 @@ function deleteFile(filePath: string) {
   });
 }
 
+function importFile(filePath: string) {
+  csInterface.evalScript(`$.runScript.importFile("${filePath}")`, function(result: string) {
+      if (result === 'true') {
+          console.log("File imported successfully");
+      } else {
+          console.log("Failed to import file");
+      }
+  });
+}
+
+
 const parseOutputData = (outputData: string): string | null => {
   const lines = outputData.split('\n');
   let downloadedFilePath: string | null = null;
@@ -185,4 +196,4 @@ const checkNvencSupport = (): boolean => {
 };
 
 // Export the initiateDownload function
-export { downloadVideo, downloadAudio, downloadCombined, checkNvencSupport, deleteFile };
+export { downloadVideo, downloadAudio, downloadCombined, checkNvencSupport, deleteFile, importFile };
