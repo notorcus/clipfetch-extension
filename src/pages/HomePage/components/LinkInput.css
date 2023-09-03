@@ -1,9 +1,11 @@
-.link-input-container {
+/* LinkInput.css */
+
+.link-input-container{
   width: 100%;
-  padding: 20px;
-  box-sizing: border-box;
+  display: flex;
   
-  border-bottom: 2px solid #313131;
+  margin-top: 10px;
+  
 }
 
 .link-input-field {
@@ -15,7 +17,6 @@
   box-sizing: border-box;
   outline: none; 
   font-size: 11px;
-  
 }
 
 .link-input-field:focus {
@@ -23,10 +24,4 @@
   color: black;
   border: 1px solid #1473E6;  /* Update this line */
   outline: none;  /* Add this line */
-}
-
-.input-with-button {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
 }

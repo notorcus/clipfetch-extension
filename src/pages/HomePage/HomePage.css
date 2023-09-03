@@ -1,0 +1,24 @@
+/* HomePage.css */
+
+/* Main container */
+.home-page-container {
+  width: 100%;
+  box-sizing: border-box;
+  border-bottom: 2px solid #313131;
+  align-items: center;
+}
+
+/* Container for link input and download button */
+.link-input-download-container {
+  
+  display: flex;
+  align-items: baseline;
+  margin: 20px;
+  margin-top: 0;
+  
+}
+
+/* Container for all the toggle buttons and their settings buttons */
+.toggle-button-settings-container {
+  margin: 20px;
+}

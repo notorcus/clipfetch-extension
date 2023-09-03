@@ -1,13 +1,14 @@
+/* ToggleButton.css */
+
 .toggle-button-container {
+    width: 100%;
     display: flex;
-    align-items: center;  /* This should align items vertically */
-    height: 36px;  /* Set a fixed height */
+    align-items: center;
     margin-top: 10px;
-  }
+}
   
 
 .toggle-button {
-    flex-grow: 1;
     height: 36px;
     width: 100%;
     padding: 7px;

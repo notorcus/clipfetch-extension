@@ -1,10 +1,11 @@
+// App.tsx
 import './index.css';
-import LinkInput from './components/LinkInput';
+import HomePage from './pages/HomePage/HomePage';
 
 function App() {
   return (
     <div className="main-container">
-      <LinkInput />
+      <HomePage />
       {/* The area below the input field */}
       <div className="below-input-area">
         {/* Content goes here */}
