@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import LinkInput from './components/LinkInput';
 import DownloadButton from './components/DownloadButton';
-import CustomDropdown from './components/CustomDropdown';  // Import the custom dropdown
+import CustomDropdown from './components/QualiyDropdown';  // Import the custom dropdown
 import './HomePage.css';
 
 const HomePage: React.FC = () => {

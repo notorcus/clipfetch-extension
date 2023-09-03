@@ -1,6 +1,6 @@
 // CustomDropdown.tsx
 import React, { useState } from 'react';
-import './CustomDropdown.css';
+import './QualityDropdown.css';
 
 interface CustomDropdownProps {
   options: string[];
