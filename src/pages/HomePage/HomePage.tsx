@@ -2,72 +2,74 @@ import React, { useState } from 'react';
 import LinkInput from './components/LinkInput';
 import ToggleButton from './components/ToggleButton';
 import DownloadButton from './components/DownloadButton';
-import './HomePage.css';  // Make sure to create and update your CSS file
+import SettingsButton from './components/SettingsButton'; // Import the SettingsButton component
+import './HomePage.css';
 
 interface HomePageProps {
-    goToSettings: () => void;
+  goToSettings: () => void;
 }
 
 const HomePage: React.FC<HomePageProps> = ({ goToSettings }) => {
-  const [inputValue, setInputValue] = useState('');  // React state to store the input value
-  const [isVideoActive, setIsVideoActive] = useState(false);
-  const [isAudioActive, setIsAudioActive] = useState(false);
-  const [isCombinedActive, setIsCombinedActive] = useState(false);
+  const [inputValue, setInputValue] = useState('');  
+  const [isActiveMap, setIsActiveMap] = useState({
+    combined: false,
+    video: false,
+    audio: false
+  });
 
   const handleInputChange = (newValue: string) => {
     setInputValue(newValue);
   };
 
   const handleToggle = (type: string, isActive: boolean) => {
-    if (type === 'video') setIsVideoActive(isActive);
-    if (type === 'audio') setIsAudioActive(isActive);
-    if (type === 'combined') setIsCombinedActive(isActive);
+    setIsActiveMap({ ...isActiveMap, [type]: isActive });
   };
 
   return (
     <div className="home-page-container">
-      {/* Global Wrapper Container */}
-      <div className="global-wrapper">
-        {/* Container for LinkInput and DownloadButton */}
-        <div className="link-input-download-container">
-          <LinkInput onInputChange={handleInputChange} />
-          <DownloadButton 
-            inputValue={inputValue} 
-            isVideoActive={isVideoActive} 
-            isAudioActive={isAudioActive} 
-            isCombinedActive={isCombinedActive} 
-          />
-        </div>
-        {/* Container for ToggleButtons and their SettingsButtons */}
-        <div className="toggle-button-settings-container">
+      <div className="link-input-download-container">
+        <LinkInput onInputChange={handleInputChange} />
+        <DownloadButton 
+          inputValue={inputValue} 
+          isVideoActive={isActiveMap.video} 
+          isAudioActive={isActiveMap.audio} 
+          isCombinedActive={isActiveMap.combined} 
+        />
+      </div>
+      <div className="toggle-button-settings-container">
+        <div className="toggle-settings-pair-container">
           <ToggleButton 
             label="Combined" 
             id="ToggleCombinedButton" 
-            settingsRoute="/settings/combined" 
-            isActive={isCombinedActive} 
+            isActive={isActiveMap.combined} 
             onToggle={(isActive) => handleToggle('combined', isActive)} 
-            goToSettingsPage={goToSettings}
+            goToSettingsPage={goToSettings} 
           />
+          <SettingsButton route="/settings/combined" isActive={isActiveMap.combined} goToSettingsPage={goToSettings} />
+        </div>
+        <div className="toggle-settings-pair-container">
           <ToggleButton 
             label="Video Only" 
             id="ToggleVideoOnlyButton" 
-            settingsRoute="/settings/video-only" 
-            isActive={isVideoActive} 
+            isActive={isActiveMap.video} 
             onToggle={(isActive) => handleToggle('video', isActive)} 
-            goToSettingsPage={goToSettings}
+            goToSettingsPage={goToSettings} 
           />
+          <SettingsButton route="/settings/video-only" isActive={isActiveMap.video} goToSettingsPage={goToSettings} />
+        </div>
+        <div className="toggle-settings-pair-container">
           <ToggleButton 
             label="Audio Only" 
             id="ToggleAudioOnlyButton" 
-            settingsRoute="/settings/audio-only" 
-            isActive={isAudioActive} 
+            isActive={isActiveMap.audio} 
             onToggle={(isActive) => handleToggle('audio', isActive)} 
             goToSettingsPage={goToSettings} 
           />
+          <SettingsButton route="/settings/audio-only" isActive={isActiveMap.audio} goToSettingsPage={goToSettings} />
         </div>
       </div>
     </div>
-  );
+  );  
 };
 
 export default HomePage;

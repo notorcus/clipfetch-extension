@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import './index.css';
 import HomePage from './pages/HomePage/HomePage';
-// import SettingsPage from './pages/SettingsPage/SettingsPage'; // Uncomment this once you create the SettingsPage component
+import SettingsPage from './pages/SettingsPage/SettingsPage'; // Uncommented this line
 
 function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'settings'>('home');
@@ -13,8 +13,7 @@ function App() {
   return (
     <div className="main-container">
       {currentPage === 'home' && <HomePage goToSettings={goToSettingsPage} />}
-      {/* Uncomment the line below once you create the SettingsPage component */}
-      {/* {currentPage === 'settings' && <SettingsPage goToHome={goToHomePage} />} */}
+      {currentPage === 'settings' && <SettingsPage goToHome={goToHomePage} />} {/* Uncommented this line */}
       
       <div className="below-input-area">
         {/* Content goes here */}
