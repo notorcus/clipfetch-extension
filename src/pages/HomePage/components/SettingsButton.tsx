@@ -5,14 +5,13 @@ import './SettingsButton.css';
 interface SettingsButtonProps {
   route: string;
   isActive: boolean;
-  goToSettingsPage: () => void;  // <-- New prop here
+  goToSettingsPage: () => void;
 }
 
 const SettingsButton: React.FC<SettingsButtonProps> = ({ route, isActive, goToSettingsPage }) => {
   const navigateToSettings = () => {
     if (isActive) {
-      // Logic to navigate to the settings page
-      goToSettingsPage();  // <-- Call the function to navigate
+      goToSettingsPage();
     }
   };
 
@@ -21,7 +20,6 @@ const SettingsButton: React.FC<SettingsButtonProps> = ({ route, isActive, goToSe
       className={`settings-button ${isActive ? '' : 'disabled'}`} 
       onClick={navigateToSettings}
     >
-      {/* You can replace this with an icon */}
       S
     </button>
   );

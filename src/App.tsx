@@ -2,22 +2,22 @@
 import React, { useState } from 'react';
 import './index.css';
 import HomePage from './pages/HomePage/HomePage';
-import SettingsPage from './pages/SettingsPage/SettingsPage'; // Uncommented this line
+import SettingsPage from './pages/SettingsPage/SettingsPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'settings'>('home');
+  const [currentSettingsPage, setCurrentSettingsPage] = useState<string>('');
 
   const goToHomePage = () => setCurrentPage('home');
-  const goToSettingsPage = () => setCurrentPage('settings');
+  const goToSettingsPage = (pageName: string) => {
+    setCurrentSettingsPage(pageName);
+    setCurrentPage('settings');
+  };
 
   return (
     <div className="main-container">
-      {currentPage === 'home' && <HomePage goToSettings={goToSettingsPage} />}
-      {currentPage === 'settings' && <SettingsPage goToHome={goToHomePage} />} {/* Uncommented this line */}
-      
-      <div className="below-input-area">
-        {/* Content goes here */}
-      </div>
+      {currentPage === 'home' && <HomePage goToSettingsPage={goToSettingsPage} />}
+      {currentPage === 'settings' && <SettingsPage goToHome={goToHomePage} pageName={currentSettingsPage} />}
     </div>
   );
 }

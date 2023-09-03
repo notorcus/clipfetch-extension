@@ -6,10 +6,10 @@ import SettingsButton from './components/SettingsButton'; // Import the Settings
 import './HomePage.css';
 
 interface HomePageProps {
-  goToSettings: () => void;
+    goToSettingsPage: (pageName: string) => void;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ goToSettings }) => {
+const HomePage: React.FC<HomePageProps> = ({ goToSettingsPage }) => {
   const [inputValue, setInputValue] = useState('');  
   const [isActiveMap, setIsActiveMap] = useState({
     combined: false,
@@ -43,9 +43,9 @@ const HomePage: React.FC<HomePageProps> = ({ goToSettings }) => {
             id="ToggleCombinedButton" 
             isActive={isActiveMap.combined} 
             onToggle={(isActive) => handleToggle('combined', isActive)} 
-            goToSettingsPage={goToSettings} 
+            goToSettingsPage={() => goToSettingsPage("Combined Settings")}
           />
-          <SettingsButton route="/settings/combined" isActive={isActiveMap.combined} goToSettingsPage={goToSettings} />
+          <SettingsButton route="/settings/combined" isActive={isActiveMap.combined} goToSettingsPage={() => goToSettingsPage("Combined Settings")} />
         </div>
         <div className="toggle-settings-pair-container">
           <ToggleButton 
@@ -53,9 +53,9 @@ const HomePage: React.FC<HomePageProps> = ({ goToSettings }) => {
             id="ToggleVideoOnlyButton" 
             isActive={isActiveMap.video} 
             onToggle={(isActive) => handleToggle('video', isActive)} 
-            goToSettingsPage={goToSettings} 
+            goToSettingsPage={() => goToSettingsPage("Video Only Settings")}
           />
-          <SettingsButton route="/settings/video-only" isActive={isActiveMap.video} goToSettingsPage={goToSettings} />
+          <SettingsButton route="/settings/video-only" isActive={isActiveMap.video} goToSettingsPage={() => goToSettingsPage("Video Only Settings")} />
         </div>
         <div className="toggle-settings-pair-container">
           <ToggleButton 
@@ -63,9 +63,9 @@ const HomePage: React.FC<HomePageProps> = ({ goToSettings }) => {
             id="ToggleAudioOnlyButton" 
             isActive={isActiveMap.audio} 
             onToggle={(isActive) => handleToggle('audio', isActive)} 
-            goToSettingsPage={goToSettings} 
+            goToSettingsPage={() => goToSettingsPage("Audio Only Settings")}
           />
-          <SettingsButton route="/settings/audio-only" isActive={isActiveMap.audio} goToSettingsPage={goToSettings} />
+          <SettingsButton route="/settings/audio-only" isActive={isActiveMap.audio} goToSettingsPage={() => goToSettingsPage("Audio Only Settings")} />
         </div>
       </div>
     </div>

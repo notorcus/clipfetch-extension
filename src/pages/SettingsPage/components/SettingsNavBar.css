@@ -1,0 +1,32 @@
+/* SettingsNavBar.css */
+
+.settings-nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #1D1D1D;
+}
+  
+.go-back-button {
+    margin-right: auto;
+}
+  
+.page-name {
+    margin-left: auto;
+    font-weight: bold;
+}
+
+.go-back-button{
+    height: 36px;
+    padding: 7px;
+    border: 1px solid #313131;
+    background-color: #1D1D1D;
+    color: rgb(175, 175, 175); /* Text color */
+    box-sizing: border-box;
+    outline: none;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: ease 0.1s;
+}
+  
