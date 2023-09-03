@@ -4,7 +4,11 @@ import ToggleButton from './components/ToggleButton';
 import DownloadButton from './components/DownloadButton';
 import './HomePage.css';  // Make sure to create and update your CSS file
 
-const HomePage: React.FC = () => {
+interface HomePageProps {
+    goToSettings: () => void;
+}
+
+const HomePage: React.FC<HomePageProps> = ({ goToSettings }) => {
   const [inputValue, setInputValue] = useState('');  // React state to store the input value
   const [isVideoActive, setIsVideoActive] = useState(false);
   const [isAudioActive, setIsAudioActive] = useState(false);
@@ -42,6 +46,7 @@ const HomePage: React.FC = () => {
             settingsRoute="/settings/combined" 
             isActive={isCombinedActive} 
             onToggle={(isActive) => handleToggle('combined', isActive)} 
+            goToSettingsPage={goToSettings}
           />
           <ToggleButton 
             label="Video Only" 
@@ -49,6 +54,7 @@ const HomePage: React.FC = () => {
             settingsRoute="/settings/video-only" 
             isActive={isVideoActive} 
             onToggle={(isActive) => handleToggle('video', isActive)} 
+            goToSettingsPage={goToSettings}
           />
           <ToggleButton 
             label="Audio Only" 
@@ -56,6 +62,7 @@ const HomePage: React.FC = () => {
             settingsRoute="/settings/audio-only" 
             isActive={isAudioActive} 
             onToggle={(isActive) => handleToggle('audio', isActive)} 
+            goToSettingsPage={goToSettings} 
           />
         </div>
       </div>

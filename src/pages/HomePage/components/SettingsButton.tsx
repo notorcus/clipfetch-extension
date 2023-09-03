@@ -5,13 +5,14 @@ import './SettingsButton.css';
 interface SettingsButtonProps {
   route: string;
   isActive: boolean;
+  goToSettingsPage: () => void;  // <-- New prop here
 }
 
-const SettingsButton: React.FC<SettingsButtonProps> = ({ route, isActive }) => {
+const SettingsButton: React.FC<SettingsButtonProps> = ({ route, isActive, goToSettingsPage }) => {
   const navigateToSettings = () => {
     if (isActive) {
-      // Logic to navigate to the settings page can go here
-      console.log(`Navigate to ${route}`);
+      // Logic to navigate to the settings page
+      goToSettingsPage();  // <-- Call the function to navigate
     }
   };
 
