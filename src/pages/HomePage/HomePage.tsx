@@ -13,6 +13,7 @@ const HomePage: React.FC = () => {
   const [selectedVideoFormat, setSelectedVideoFormat] = useState<string>('');
   const [selectedAudioFormat, setSelectedAudioFormat] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (inputValue) {
@@ -20,9 +21,9 @@ const HomePage: React.FC = () => {
       getAvailableFormats(inputValue, (error, bestFormatsByResolution, bestAudioFormats) => {
         setIsLoading(false);  // Stop loading
         if (error) {
-          console.error('Failed to get formats:', error);
+          setErrorMessage('Invalid Link!');
         } else {
-
+          setErrorMessage(null);
           // console.log("Best audio formats received:", bestAudioFormats);
   
           // Set video options
@@ -49,6 +50,7 @@ const HomePage: React.FC = () => {
     <div className="home-page-container">
       <div className="link-input-container">
         <LinkInput onInputChange={handleInputChange} />
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
         {isLoading && <div className="loading-bar"><div></div></div>}
       </div>
       {inputValue && (
