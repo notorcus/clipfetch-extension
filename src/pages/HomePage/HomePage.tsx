@@ -13,17 +13,20 @@ const HomePage: React.FC = () => {
   const [selectedVideoFormat, setSelectedVideoFormat] = useState<string>('');
   const [selectedAudioFormat, setSelectedAudioFormat] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [hasError, setHasError] = useState<boolean>(false);
+  const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (inputValue) {
       setIsLoading(true);  // Start loading
-      getAvailableFormats(inputValue, (error, bestFormatsByResolution, bestAudioFormats) => {
+      getAvailableFormats(inputValue, (error, bestFormatsByResolution, bestAudioFormats, videoTitle) => {
         setIsLoading(false);  // Stop loading
         if (error) {
-          setErrorMessage('Invalid Link!');
+          setMessage('Invalid Link!');
+          setHasError(true);  
         } else {
-          setErrorMessage(null);
+          setMessage(`Video Title: ${videoTitle}`);
+          setHasError(false);  
           // console.log("Best audio formats received:", bestAudioFormats);
   
           // Set video options
@@ -50,10 +53,10 @@ const HomePage: React.FC = () => {
     <div className="home-page-container">
       <div className="link-input-container">
         <LinkInput onInputChange={handleInputChange} />
-        {errorMessage && <div className="error-message">{errorMessage}</div>}
         {isLoading && <div className="loading-bar"><div></div></div>}
+        {message && <div className="message">{message}</div>}
       </div>
-      {inputValue && (
+      {inputValue && !hasError && (
         <>
           <div className="dropdown-container">
             {Object.keys(videoOptions).length > 0 && (

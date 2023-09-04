@@ -1,7 +1,7 @@
 // DownloadUtils.ts
 import { spawn } from 'child_process';
 
-export const getAvailableFormats = (url: string, callback: (error: any, videoData?: any, audioData?: any) => void) => {
+export const getAvailableFormats = (url: string, callback: (error: any, videoData?: any, audioData?: any, videoTitle?: string) => void) => {
   const ytDlp = spawn('yt-dlp', ['--dump-json', url]);
   let output = '';
   let errorOutput = '';
@@ -21,6 +21,7 @@ export const getAvailableFormats = (url: string, callback: (error: any, videoDat
 
     try {
       const parsedData = JSON.parse(output);
+      const videoTitle = parsedData.title || "Unknown Title";
       const availableFormats = parsedData.formats || [];
     
       const formatsByResolution = groupFormatsByResolution(availableFormats);
@@ -29,7 +30,7 @@ export const getAvailableFormats = (url: string, callback: (error: any, videoDat
       const audioFormats = availableFormats.filter((format: any) => format.acodec !== 'none');
       const bestAudioFormats = getBestAudioFormats(audioFormats);
     
-      callback(null, bestFormatsByResolution, bestAudioFormats);
+      callback(null, bestFormatsByResolution, bestAudioFormats, videoTitle);
     } catch (err) {
       callback(err);
     }
