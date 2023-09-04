@@ -12,10 +12,8 @@ const initiateDownload = async (inputValue: string, videoFormatId: string, audio
   
     try {
       const videoPrompt = await downloadStream(inputValue, videoFormatId);
-      console.log("Video Format: ", videoFormatId)
       console.log("Video download prompt:", videoPrompt);
   
-      console.log("Audio Format: ", audioFormatId)
       const audioPrompt = await downloadStream(inputValue, audioFormatId);
       console.log("Audio download prompt:", audioPrompt);
     } catch (error) {

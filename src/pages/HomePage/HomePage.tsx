@@ -49,24 +49,35 @@ const HomePage: React.FC = () => {
         <LinkInput onInputChange={handleInputChange} />
       </div>
       {inputValue && (
-        <div className="dropdown-container">
-          <QualityDropdown 
-            options={Object.keys(videoOptions)} 
-            label="Video Quality" 
-            onSelect={(selected) => setSelectedVideoFormat(videoOptions[selected])} 
-          />
-          <QualityDropdown 
-            options={Object.keys(audioOptions)}
-            label="Audio Quality" 
-            onSelect={(selected) => setSelectedAudioFormat(audioOptions[selected])} 
-          />
-        </div>
+        <>
+          <div className="dropdown-container">
+            {Object.keys(videoOptions).length > 0 && (
+              <QualityDropdown 
+                options={Object.keys(videoOptions)} 
+                label="Video Quality" 
+                onSelect={(selected) => setSelectedVideoFormat(videoOptions[selected])} 
+              />
+            )}
+            {Object.keys(audioOptions).length > 0 && (
+              <QualityDropdown 
+                options={Object.keys(audioOptions)} 
+                label="Audio Quality" 
+                onSelect={(selected) => setSelectedAudioFormat(audioOptions[selected])} 
+              />
+            )}
+          </div>
+          {/* Show DownloadButton only if both dropdowns have options */}
+          {(Object.keys(videoOptions).length > 0 && Object.keys(audioOptions).length > 0) && (
+            <div className="download-button-container">
+              <DownloadButton 
+                inputValue={inputValue} 
+                videoFormatId={selectedVideoFormat} 
+                audioFormatId={selectedAudioFormat} 
+              />
+            </div>
+          )}
+        </>
       )}
-      <DownloadButton 
-        inputValue={inputValue} 
-        videoFormatId={selectedVideoFormat} 
-        audioFormatId={selectedAudioFormat} 
-      />
     </div>
   );  
 };
