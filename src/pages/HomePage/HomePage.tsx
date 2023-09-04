@@ -10,6 +10,9 @@ const HomePage: React.FC = () => {
   const [inputValue, setInputValue] = useState('');  
   const [videoOptions, setVideoOptions] = useState<{ [resolution: string]: string }>({});
   const [audioOptions, setAudioOptions] = useState<any[]>([]);
+  const [selectedVideoFormat, setSelectedVideoFormat] = useState<string>('');
+  const [selectedAudioFormat, setSelectedAudioFormat] = useState<string>('');
+
 
   useEffect(() => {
     if (inputValue) {
@@ -41,11 +44,23 @@ const HomePage: React.FC = () => {
       </div>
       {inputValue && (
         <div className="dropdown-container">
-          <QualityDropdown options={Object.keys(videoOptions)} label="Video Quality" />
-          <QualityDropdown options={audioOptions} label="Audio Quality" />
+          <QualityDropdown 
+            options={Object.keys(videoOptions)} 
+            label="Video Quality" 
+            onSelect={(selected) => setSelectedVideoFormat(videoOptions[selected])} 
+          />
+          <QualityDropdown 
+            options={audioOptions} 
+            label="Audio Quality" 
+            onSelect={setSelectedAudioFormat} 
+          />
         </div>
       )}
-      <DownloadButton inputValue={inputValue} />
+      <DownloadButton 
+        inputValue={inputValue} 
+        videoFormatId={selectedVideoFormat} 
+        audioFormatId={selectedAudioFormat} 
+      />
     </div>
   );  
 };

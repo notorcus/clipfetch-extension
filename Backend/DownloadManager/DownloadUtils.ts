@@ -21,43 +21,59 @@ export const getAvailableFormats = (url: string, callback: (error: any, videoDat
 
     try {
       const parsedData = JSON.parse(output);
-      const availableFormats = parsedData.formats || [];  // Assumes that 'formats' is the relevant key
+      const availableFormats = parsedData.formats || [];
 
-      // Group formats by resolution
       const formatsByResolution: { [resolution: string]: any[] } = {};
       const audioFormats: any[] = [];
       availableFormats.forEach((format: any) => {
-        if (format.vcodec !== 'none') {  // Video-only formats
+        if (format.vcodec !== 'none') {
           const resolution = format.resolution || `${format.width}x${format.height}`;
           if (!formatsByResolution[resolution]) {
             formatsByResolution[resolution] = [];
           }
           formatsByResolution[resolution].push(format);
-        } else if (format.acodec !== 'none') {  // Audio-only formats
+        } else if (format.acodec !== 'none') {
           audioFormats.push(format);
         }
       });
 
-      // Find the best format for each resolution based on vbr and fps
+      // Sort and filter video formats
+      const sortedResolutions = Object.keys(formatsByResolution).sort((a, b) => {
+        const [widthA] = a.split('x').map(Number);
+        const [widthB] = b.split('x').map(Number);
+        return widthB - widthA;
+      });
       const bestFormatsByResolution: { [resolution: string]: any } = {};
-      for (const resolution in formatsByResolution) {
+      sortedResolutions.forEach(resolution => {
         const formats = formatsByResolution[resolution];
         formats.sort((a, b) => (b.vbr || 0) - (a.vbr || 0) || (b.fps || 0) - (a.fps || 0));
         bestFormatsByResolution[resolution] = formats[0];
-      }
+      });
 
-      // Sort audio formats by bitrate
-      audioFormats.sort((a, b) => (b.abr || 0) - (a.abr || 0));
-      const bestAudioFormats = audioFormats.map(format => ({
-        format_id: format.format_id,
-        abr: format.abr,
-        friendlyName: `${format.abr}kbps`,
+      // Filter and sort audio formats
+      const uniqueAudioFormats = Array.from(new Set(audioFormats.map(format => Math.round(format.abr))));
+      uniqueAudioFormats.sort((a, b) => b - a);
+      const bestAudioFormats = uniqueAudioFormats.map(abr => ({
+        abr,
+        friendlyName: `${abr}kbps`,
       }));
 
       callback(null, bestFormatsByResolution, bestAudioFormats);
 
     } catch (err) {
       callback(err);
+    }
+  });
+};
+
+export const downloadStream = (url: string, formatId: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    try {
+      // Construct the yt-dlp command-line prompt
+      const ytDlpPrompt = `yt-dlp -f ${formatId} ${url}`;
+      resolve(ytDlpPrompt);
+    } catch (error) {
+      reject(`Failed to construct yt-dlp prompt: ${error}`);
     }
   });
 };

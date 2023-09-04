@@ -5,15 +5,18 @@ import './QualityDropdown.css';
 interface QualityDropdownProps {
   options: string[];
   label: string;
+  onSelect: (selected: string) => void;
 }
 
-const QualityDropdown: React.FC<QualityDropdownProps> = ({ options, label }) => {
+const QualityDropdown: React.FC<QualityDropdownProps> = ({ options, label, onSelect }) => {
   const [selectedOption, setSelectedOption] = useState(options[0]);
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOptionClick = (option: string) => {
     setSelectedOption(option);
     setIsOpen(false);
+    onSelect(option);
+
   };
 
   return (
