@@ -1,14 +1,16 @@
 /* HomePage.css */
 
 /* Main container */
+
 .home-page-container {
+  font-family: 'Roboto', sans-serif;
   box-sizing: border-box;
   border-bottom: 2px solid #31313100;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-bottom: 15px;
-  
+  font-weight: 400;
 }
 
 .dropdown-container{
@@ -48,5 +50,6 @@
 .message {
   padding-top: 10px;
   padding-left: 5px;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 500;
 }
