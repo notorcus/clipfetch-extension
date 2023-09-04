@@ -1,7 +1,6 @@
 // LinkInput.tsx
 import React from 'react';
 import './LinkInput.css';
-import { getAvailableFormats } from '../../../../backend/DownloadManager/DownloadUtils'; 
 
 interface LinkInputProps {
   onInputChange: (newValue: string) => void;
@@ -11,16 +10,6 @@ const LinkInput: React.FC<LinkInputProps> = ({ onInputChange }) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     onInputChange(newValue);
-  
-    if (newValue) {
-      getAvailableFormats(newValue, (error, data) => {
-        if (error) {
-          console.error("Failed to get available formats:", error);
-        } else {
-          console.log("Available formats:", data);
-        }
-      });
-    }
   };
 
   return (
@@ -29,7 +18,7 @@ const LinkInput: React.FC<LinkInputProps> = ({ onInputChange }) => {
         type="text" 
         className="link-input-field" 
         placeholder="Enter link..." 
-        onChange={handleInputChange}  // Update state on input change
+        onChange={handleInputChange}
       />
     </div>
   );

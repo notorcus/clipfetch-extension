@@ -20,18 +20,19 @@ const HomePage: React.FC = () => {
         if (error) {
           console.error('Failed to get formats:', error);
         } else {
+          // Set video options
           const videoOpts: { [resolution: string]: string } = {};
           Object.keys(bestFormatsByResolution).forEach(resolution => {
             videoOpts[resolution] = bestFormatsByResolution[resolution].format_id;
           });
           setVideoOptions(videoOpts);
-
-          // Set audioOptions
-          setAudioOptions(bestAudioFormats.map((format: { friendlyName: any; }) => format.friendlyName));
+  
+          // Set audio options
+          setAudioOptions(Object.keys(bestAudioFormats)); // Update this line
         }
       });
     }
-  }, [inputValue]);
+  }, [inputValue]);    
 
   const handleInputChange = (newValue: string) => {
     setInputValue(newValue);

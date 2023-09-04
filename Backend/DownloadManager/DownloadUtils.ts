@@ -22,48 +22,71 @@ export const getAvailableFormats = (url: string, callback: (error: any, videoDat
     try {
       const parsedData = JSON.parse(output);
       const availableFormats = parsedData.formats || [];
-
-      const formatsByResolution: { [resolution: string]: any[] } = {};
-      const audioFormats: any[] = [];
-      availableFormats.forEach((format: any) => {
-        if (format.vcodec !== 'none') {
-          const resolution = format.resolution || `${format.width}x${format.height}`;
-          if (!formatsByResolution[resolution]) {
-            formatsByResolution[resolution] = [];
-          }
-          formatsByResolution[resolution].push(format);
-        } else if (format.acodec !== 'none') {
-          audioFormats.push(format);
-        }
-      });
-
-      // Sort and filter video formats
-      const sortedResolutions = Object.keys(formatsByResolution).sort((a, b) => {
-        const [widthA] = a.split('x').map(Number);
-        const [widthB] = b.split('x').map(Number);
-        return widthB - widthA;
-      });
-      const bestFormatsByResolution: { [resolution: string]: any } = {};
-      sortedResolutions.forEach(resolution => {
-        const formats = formatsByResolution[resolution];
-        formats.sort((a, b) => (b.vbr || 0) - (a.vbr || 0) || (b.fps || 0) - (a.fps || 0));
-        bestFormatsByResolution[resolution] = formats[0];
-      });
-
-      // Filter and sort audio formats
-      const uniqueAudioFormats = Array.from(new Set(audioFormats.map(format => Math.round(format.abr))));
-      uniqueAudioFormats.sort((a, b) => b - a);
-      const bestAudioFormats = uniqueAudioFormats.map(abr => ({
-        abr,
-        friendlyName: `${abr}kbps`,
-      }));
-
+    
+      const formatsByResolution = groupFormatsByResolution(availableFormats);
+      const bestFormatsByResolution = getBestVideoFormats(formatsByResolution);
+    
+      const audioFormats = availableFormats.filter((format: any) => format.acodec !== 'none');
+      const bestAudioFormats = getBestAudioFormats(audioFormats);
+    
       callback(null, bestFormatsByResolution, bestAudioFormats);
-
     } catch (err) {
       callback(err);
     }
   });
+};
+
+const groupFormatsByResolution = (formats: any[]) => {
+  const formatsByResolution: { [resolution: string]: any[] } = {};
+  formats.forEach((format: any) => {
+    if (format.vcodec !== 'none') {
+      const resolution = format.resolution || `${format.width}x${format.height}`;
+      if (!formatsByResolution[resolution]) {
+        formatsByResolution[resolution] = [];
+      }
+      formatsByResolution[resolution].push(format);
+    }
+  });
+  return formatsByResolution;
+};
+
+const getBestVideoFormats = (formatsByResolution: { [resolution: string]: any[] }) => {
+  const sortedResolutions = Object.keys(formatsByResolution).sort((a, b) => {
+    const [widthA] = a.split('x').map(Number);
+    const [widthB] = b.split('x').map(Number);
+    return widthB - widthA;
+  });
+
+  const bestFormatsByResolution: { [resolution: string]: any } = {};
+  sortedResolutions.forEach(resolution => {
+    const formats = formatsByResolution[resolution];
+    formats.sort((a, b) => (b.vbr || 0) - (a.vbr || 0) || (b.fps || 0) - (a.fps || 0));
+    bestFormatsByResolution[resolution] = formats[0];
+  });
+
+  return bestFormatsByResolution;
+};
+
+const getBestAudioFormats = (audioFormats: any[]) => {
+  const bestAudioFormats: { [friendlyName: string]: string } = {};
+
+  // Filter out formats with 0kbps and sort from high to low
+  const filteredAndSortedAudioFormats = audioFormats
+    .filter((format) => Math.round(format.abr) > 0)
+    .sort((a, b) => Math.round(b.abr) - Math.round(a.abr));
+
+  // Remove redundant formats and populate bestAudioFormats
+  const uniqueBitRates = new Set();
+  filteredAndSortedAudioFormats.forEach((format) => {
+    const roundedAbr = Math.round(format.abr);
+    if (!uniqueBitRates.has(roundedAbr)) {
+      uniqueBitRates.add(roundedAbr);
+      const friendlyName = `${roundedAbr}kbps`;
+      bestAudioFormats[friendlyName] = format.format_id;
+      console.log(`Friendly name: ${friendlyName}, Format ID: ${format.format_id}`);  // Keep this line for verification
+    }
+  });
+  return bestAudioFormats;
 };
 
 export const downloadStream = (url: string, formatId: string): Promise<string> => {
