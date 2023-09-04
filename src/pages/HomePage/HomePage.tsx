@@ -25,7 +25,7 @@ const HomePage: React.FC = () => {
           setMessage('Invalid Link!');
           setHasError(true);  
         } else {
-          setMessage(`Video Title: ${videoTitle}`);
+          setMessage(`${videoTitle}`);
           setHasError(false);  
           // console.log("Best audio formats received:", bestAudioFormats);
   
@@ -52,9 +52,9 @@ const HomePage: React.FC = () => {
   return (
     <div className="home-page-container">
       <div className="link-input-container">
+        {message && <div className="message">{message}</div>}
         <LinkInput onInputChange={handleInputChange} />
         {isLoading && <div className="loading-bar"><div></div></div>}
-        {message && <div className="message">{message}</div>}
       </div>
       {inputValue && !hasError && (
         <>
