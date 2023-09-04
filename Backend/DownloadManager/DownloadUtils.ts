@@ -62,6 +62,7 @@ const getBestVideoFormats = (formatsByResolution: { [resolution: string]: any[] 
     const formats = formatsByResolution[resolution];
     formats.sort((a, b) => (b.vbr || 0) - (a.vbr || 0) || (b.fps || 0) - (a.fps || 0));
     bestFormatsByResolution[resolution] = formats[0];
+    // console.log(`Resolution: ${resolution}, Best format ID: ${formats[0].format_id}`);
   });
 
   return bestFormatsByResolution;
@@ -83,7 +84,7 @@ const getBestAudioFormats = (audioFormats: any[]) => {
       uniqueBitRates.add(roundedAbr);
       const friendlyName = `${roundedAbr}kbps`;
       bestAudioFormats[friendlyName] = format.format_id;
-      console.log(`Friendly name: ${friendlyName}, Format ID: ${format.format_id}`);  // Keep this line for verification
+      // console.log(`Friendly name: ${friendlyName}, Format ID: ${format.format_id}`); 
     }
   });
   return bestAudioFormats;

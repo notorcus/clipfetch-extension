@@ -9,7 +9,7 @@ import './HomePage.css';
 const HomePage: React.FC = () => {
   const [inputValue, setInputValue] = useState('');  
   const [videoOptions, setVideoOptions] = useState<{ [resolution: string]: string }>({});
-  const [audioOptions, setAudioOptions] = useState<any[]>([]);
+  const [audioOptions, setAudioOptions] = useState<{ [friendlyName: string]: string }>({});
   const [selectedVideoFormat, setSelectedVideoFormat] = useState<string>('');
   const [selectedAudioFormat, setSelectedAudioFormat] = useState<string>('');
 
@@ -20,6 +20,9 @@ const HomePage: React.FC = () => {
         if (error) {
           console.error('Failed to get formats:', error);
         } else {
+
+          // console.log("Best audio formats received:", bestAudioFormats);
+  
           // Set video options
           const videoOpts: { [resolution: string]: string } = {};
           Object.keys(bestFormatsByResolution).forEach(resolution => {
@@ -28,11 +31,13 @@ const HomePage: React.FC = () => {
           setVideoOptions(videoOpts);
   
           // Set audio options
-          setAudioOptions(Object.keys(bestAudioFormats)); // Update this line
+          setAudioOptions(bestAudioFormats); 
+
         }
       });
     }
-  }, [inputValue]);    
+  }, [inputValue]);
+  
 
   const handleInputChange = (newValue: string) => {
     setInputValue(newValue);
@@ -51,9 +56,9 @@ const HomePage: React.FC = () => {
             onSelect={(selected) => setSelectedVideoFormat(videoOptions[selected])} 
           />
           <QualityDropdown 
-            options={audioOptions} 
+            options={Object.keys(audioOptions)}
             label="Audio Quality" 
-            onSelect={setSelectedAudioFormat} 
+            onSelect={(selected) => setSelectedAudioFormat(audioOptions[selected])} 
           />
         </div>
       )}
