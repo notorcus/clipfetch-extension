@@ -98,7 +98,7 @@ export const downloadStream = (url: string, formatId: string, outputPath: string
     let stderrData = '';
 
     // First, download the video
-    const ytDlpDownload = spawn('yt-dlp', ['-f', formatId, url, '-o', `${outputPath}\\%(title)s.%(ext)s`]);
+    const ytDlpDownload = spawn('yt-dlp', ['-f', formatId, url, '-o', `${outputPath}\\%(title)s(temp).%(ext)s`]);
 
     ytDlpDownload.stdout.on('data', (data) => {
       stdoutData += data;
@@ -113,7 +113,7 @@ export const downloadStream = (url: string, formatId: string, outputPath: string
         console.log(`Full stdout: ${stdoutData}`);
 
         // Now get the filename
-        const ytDlpFilename = spawn('yt-dlp', ['--get-filename', '-f', formatId, url, '-o', `${outputPath}\\%(title)s.%(ext)s`]);
+        const ytDlpFilename = spawn('yt-dlp', ['--get-filename', '-f', formatId, url, '-o', `${outputPath}\\%(title)s(temp).%(ext)s`]);
         let filename = '';
 
         ytDlpFilename.stdout.on('data', (data) => {
@@ -131,6 +131,43 @@ export const downloadStream = (url: string, formatId: string, outputPath: string
       } else {
         console.error(`Full stderr: ${stderrData}`);
         reject(`yt-dlp process exited with code ${code}`);
+      }
+    });
+  });
+};
+
+export const mergeStreams = (
+  videoFile: string, 
+  audioFile: string, 
+  outputPath: string,
+  title: string
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const mergedFilename = `${outputPath}\\${title}.mp4`;
+
+    // For now, we'll assume NVENC support is true for faster development
+    const supportsNvenc = true;  
+    let args;
+    
+    const videoCodec = supportsNvenc ? 'h264_nvenc' : 'libx264';
+
+    console.log(`Using ${videoCodec} for encoding.`);
+    
+    args = ['-y', '-i', videoFile, '-i', audioFile, '-c:v', videoCodec, '-preset', 'fast', '-c:a', 'aac', '-strict', 'experimental', '-f', 'mp4', mergedFilename];    
+
+    const ffmpeg = spawn('ffmpeg', args);
+
+    let errorData = '';
+    ffmpeg.stderr.on('data', (data) => {
+      errorData += data;
+    });
+
+    ffmpeg.on('close', (code) => {
+      if (code !== 0) {
+        console.log("Error output:", errorData);
+        reject(new Error(errorData));
+      } else {
+        resolve(mergedFilename);
       }
     });
   });
