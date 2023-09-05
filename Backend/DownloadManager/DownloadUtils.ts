@@ -93,21 +93,43 @@ const getBestAudioFormats = (audioFormats: any[]) => {
 
 export const downloadStream = (url: string, formatId: string, outputPath: string): Promise<string> => {
   return new Promise((resolve, reject) => {
-    // Construct the command using the specific path
-    const ytDlp = spawn('yt-dlp', ['-f', formatId, url, '-o', `${outputPath}\\%(title)s.%(ext)s`]);
+    // Variables to accumulate stdout and stderr data
+    let stdoutData = '';
+    let stderrData = '';
 
-    ytDlp.stdout.on('data', (data) => {
-      console.log(`stdout: ${data}`);
+    // First, download the video
+    const ytDlpDownload = spawn('yt-dlp', ['-f', formatId, url, '-o', `${outputPath}\\%(title)s.%(ext)s`]);
+
+    ytDlpDownload.stdout.on('data', (data) => {
+      stdoutData += data;
     });
 
-    ytDlp.stderr.on('data', (data) => {
-      console.error(`stderr: ${data}`);
+    ytDlpDownload.stderr.on('data', (data) => {
+      stderrData += data;
     });
 
-    ytDlp.on('close', (code) => {
+    ytDlpDownload.on('close', (code) => {
       if (code === 0) {
-        resolve('Download successful.');
+        console.log(`Full stdout: ${stdoutData}`);
+
+        // Now get the filename
+        const ytDlpFilename = spawn('yt-dlp', ['--get-filename', '-f', formatId, url, '-o', `${outputPath}\\%(title)s.%(ext)s`]);
+        let filename = '';
+
+        ytDlpFilename.stdout.on('data', (data) => {
+          filename += data;
+        });
+
+        ytDlpFilename.on('close', (code) => {
+          if (code === 0) {
+            resolve(filename.trim());  // Return the filename
+          } else {
+            reject(`yt-dlp process exited with code ${code}`);
+          }
+        });
+
       } else {
+        console.error(`Full stderr: ${stderrData}`);
         reject(`yt-dlp process exited with code ${code}`);
       }
     });

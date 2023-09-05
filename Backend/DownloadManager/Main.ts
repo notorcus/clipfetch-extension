@@ -11,12 +11,15 @@ export const initiateDownload = async (inputValue: string, videoFormatId: string
   console.log("Initiating download...");
 
   try {
-    const videoPrompt = await downloadStream(inputValue, videoFormatId, outputPath);
-    console.log("Video download prompt:", videoPrompt);
+    const [videoFilePath, audioFilePath] = await Promise.all([
+      downloadStream(inputValue, videoFormatId, outputPath),
+      downloadStream(inputValue, audioFormatId, outputPath),
+    ]);
 
-    const audioPrompt = await downloadStream(inputValue, audioFormatId, outputPath);
-    console.log("Audio download prompt:", audioPrompt);
+    console.log("Video path:", videoFilePath);
+    console.log("Audio path:", audioFilePath);
   } catch (error) {
     console.log("Error:", error);
   }
 };
+
