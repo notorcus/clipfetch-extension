@@ -93,43 +93,39 @@ const getBestAudioFormats = (audioFormats: any[]) => {
   return bestAudioFormats;
 };
 
-const downloadStream = (url: string, formatId: string, outputPath: string): Promise<string> => {
+const downloadStream = (url: string, formatId: string, outputPath: string): Promise<{absFilePath: string, fileName: string}> => {
   return new Promise((resolve, reject) => {
-    // Variables to accumulate stdout and stderr data
-    let stdoutData = '';
+    // Variables to accumulate stderr data and stdout data for filename
     let stderrData = '';
+    let stdoutData = '';
 
-    // First, download the video
-    const ytDlpDownload = spawn('yt-dlp', ['-f', formatId, url, '-o', `${outputPath}\\%(title)s(temp).%(ext)s`]);
+    // Generate a unique ID and filename
+    const uniqueID = generateRandomString(8);  // 8-character long random string
+    const fileName = `${uniqueID}.%(ext)s`;
+    const tempFilePath = `${outputPath}/${fileName}`;
 
-    ytDlpDownload.stdout.on('data', (data) => {
-      stdoutData += data;
-    });
+    const ytDlpDownload = spawn('yt-dlp', ['-f', formatId, url, '-o', tempFilePath]);
 
     ytDlpDownload.stderr.on('data', (data) => {
       stderrData += data;
     });
 
-    ytDlpDownload.on('close', (code) => {
+    ytDlpDownload.on('close', async (code) => {
       if (code === 0) {
-        // console.log(`Full stdout: ${stdoutData}`);
-
-        // Now get the filename
-        const ytDlpFilename = spawn('yt-dlp', ['--get-filename', '-f', formatId, url, '-o', `${outputPath}\\%(title)s(temp).%(ext)s`]);
-        let filename = '';
-
+        // After successful download, fetch the absolute filename
+        const ytDlpFilename = spawn('yt-dlp', ['--get-filename', '-f', formatId, url, '-o', tempFilePath]);
+        
         ytDlpFilename.stdout.on('data', (data) => {
-          filename += data;
+          stdoutData += data;
         });
 
         ytDlpFilename.on('close', (code) => {
           if (code === 0) {
-            resolve(filename.trim());  // Return the filename
+            resolve({ absFilePath: stdoutData.trim(), fileName });  // Return the absolute file path and fileName
           } else {
-            reject(`yt-dlp process exited with code ${code}`);
+            reject(`yt-dlp process for filename exited with code ${code}`);
           }
         });
-
       } else {
         console.error(`Full stderr: ${stderrData}`);
         reject(`yt-dlp process exited with code ${code}`);
@@ -138,6 +134,16 @@ const downloadStream = (url: string, formatId: string, outputPath: string): Prom
   });
 };
 
+
+function generateRandomString(length: number): string {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
+
 const mergeStreams = (
   videoFile: string, 
   audioFile: string, 
@@ -145,7 +151,7 @@ const mergeStreams = (
   title: string
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const mergedFilename = `${outputPath}\\${title}.mp4`;
+    const mergedFilename = `${outputPath}/${title}.mp4`;
 
     // For now, we'll assume NVENC support is true for faster development
     const supportsNvenc = true;  
@@ -176,7 +182,7 @@ const mergeStreams = (
 };
 
  function deleteFile(filePath: string) {
-  csInterface.evalScript(`$.runScript.deleteFile("${filePath}")`, function(result: string) {
+  csInterface.evalScript(`$.runScript.deleteFile("${filePath.replace(/\\/g, '/')}")`, function(result: string) {
       if (result === 'true') {
           console.log("File deleted successfully");
       } else {
@@ -185,4 +191,29 @@ const mergeStreams = (
   });
 }
 
-export { getAvailableFormats, downloadStream, mergeStreams, deleteFile }
+function importFile(filePath: string) {
+  csInterface.evalScript(`$.runScript.importFile("${filePath.replace(/\\/g, '/')}")`, function(result: string) {
+  });
+}
+
+const getVideoTitle = (url: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    let titleData = '';
+    const ytDlpTitle = spawn('yt-dlp', ['--get-title', url]);
+
+    ytDlpTitle.stdout.on('data', (data) => {
+      titleData += data;
+    });
+
+    ytDlpTitle.on('close', (code) => {
+      if (code === 0) {
+        resolve(titleData.trim());  // Return the video title
+      } else {
+        reject(`yt-dlp process exited with code ${code}`);
+      }
+    });
+  });
+};
+
+
+export { getAvailableFormats, downloadStream, mergeStreams, deleteFile, importFile, getVideoTitle }
