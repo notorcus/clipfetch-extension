@@ -1,6 +1,7 @@
 // DownloadButton.tsx
-import React from 'react';
-import { initiateDownload } from '../../../../backend/DownloadManager/Main';  // Update this import path
+import React, { useContext } from 'react';
+import { initiateDownload } from '../../../../backend/DownloadManager/Main';
+import { DownloadSettingsContext } from '../../../DownloadSettingsContext';  // Update this import path
 import './DownloadButton.css';
 
 interface DownloadButtonProps {
@@ -10,6 +11,9 @@ interface DownloadButtonProps {
 }
 
 const DownloadButton: React.FC<DownloadButtonProps> = ({ inputValue, videoFormatId, audioFormatId }) => {
+  const [settings] = useContext(DownloadSettingsContext);
+  const { outputPath } = settings;
+
   const handleDownloadClick = async () => {
     if (inputValue === '') {
       console.log("Input field is empty.");
@@ -17,7 +21,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({ inputValue, videoFormat
       console.log("Download button clicked. Input value:", inputValue);
 
       try {
-        await initiateDownload(inputValue, videoFormatId, audioFormatId);
+        await initiateDownload(inputValue, videoFormatId, audioFormatId, outputPath);
         console.log('Download succeeded.');
       } catch (error) {
         console.error('Download failed:', error);

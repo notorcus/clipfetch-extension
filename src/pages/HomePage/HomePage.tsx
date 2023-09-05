@@ -26,7 +26,7 @@ const HomePage: React.FC = () => {
           setHasError(true);  
         } else {
           setMessage(`${videoTitle}`);
-          setHasError(false);  
+          setHasError(false); 
           // console.log("Best audio formats received:", bestAudioFormats);
   
           // Set video options

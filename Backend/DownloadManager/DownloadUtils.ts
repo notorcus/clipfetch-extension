@@ -91,14 +91,25 @@ const getBestAudioFormats = (audioFormats: any[]) => {
   return bestAudioFormats;
 };
 
-export const downloadStream = (url: string, formatId: string): Promise<string> => {
+export const downloadStream = (url: string, formatId: string, outputPath: string): Promise<string> => {
   return new Promise((resolve, reject) => {
-    try {
-      // Construct the yt-dlp command-line prompt
-      const ytDlpPrompt = `yt-dlp -f ${formatId} ${url}`;
-      resolve(ytDlpPrompt);
-    } catch (error) {
-      reject(`Failed to construct yt-dlp prompt: ${error}`);
-    }
+    // Construct the command using the specific path
+    const ytDlp = spawn('yt-dlp', ['-f', formatId, url, '-o', `${outputPath}\\%(title)s.%(ext)s`]);
+
+    ytDlp.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`);
+    });
+
+    ytDlp.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+    });
+
+    ytDlp.on('close', (code) => {
+      if (code === 0) {
+        resolve('Download successful.');
+      } else {
+        reject(`yt-dlp process exited with code ${code}`);
+      }
+    });
   });
 };
