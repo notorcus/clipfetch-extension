@@ -1,7 +1,9 @@
 // DownloadUtils.ts
 import { spawn } from 'child_process';
 
-export const getAvailableFormats = (url: string, callback: (error: any, videoData?: any, audioData?: any, videoTitle?: string) => void) => {
+const csInterface = new CSInterface();
+
+const getAvailableFormats = (url: string, callback: (error: any, videoData?: any, audioData?: any, videoTitle?: string) => void) => {
   const ytDlp = spawn('yt-dlp', ['--dump-json', url]);
   let output = '';
   let errorOutput = '';
@@ -91,7 +93,7 @@ const getBestAudioFormats = (audioFormats: any[]) => {
   return bestAudioFormats;
 };
 
-export const downloadStream = (url: string, formatId: string, outputPath: string): Promise<string> => {
+const downloadStream = (url: string, formatId: string, outputPath: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     // Variables to accumulate stdout and stderr data
     let stdoutData = '';
@@ -110,7 +112,7 @@ export const downloadStream = (url: string, formatId: string, outputPath: string
 
     ytDlpDownload.on('close', (code) => {
       if (code === 0) {
-        console.log(`Full stdout: ${stdoutData}`);
+        // console.log(`Full stdout: ${stdoutData}`);
 
         // Now get the filename
         const ytDlpFilename = spawn('yt-dlp', ['--get-filename', '-f', formatId, url, '-o', `${outputPath}\\%(title)s(temp).%(ext)s`]);
@@ -136,7 +138,7 @@ export const downloadStream = (url: string, formatId: string, outputPath: string
   });
 };
 
-export const mergeStreams = (
+const mergeStreams = (
   videoFile: string, 
   audioFile: string, 
   outputPath: string,
@@ -172,3 +174,15 @@ export const mergeStreams = (
     });
   });
 };
+
+ function deleteFile(filePath: string) {
+  csInterface.evalScript(`$.runScript.deleteFile("${filePath}")`, function(result: string) {
+      if (result === 'true') {
+          console.log("File deleted successfully");
+      } else {
+          console.log("Failed to delete file");
+      }
+  });
+}
+
+export { getAvailableFormats, downloadStream, mergeStreams, deleteFile }
