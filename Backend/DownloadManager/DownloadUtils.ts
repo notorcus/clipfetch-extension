@@ -115,21 +115,31 @@ const downloadStream = (
       console.log("yt-dlp stderr data:", data.toString());
     });
 
-    // Capture the stdout data for download progress
+    let totalFragments = 0; // Stores the total number of fragments
+    let lastLoggedFragment = -1; // Stores the last logged fragment to avoid duplicate logs
+  
     ytDlpDownload.stdout.on('data', (data) => {
       const output = data.toString();
-      // console.log("stdout: ", output)
   
       // Extract total fragments
       const totalFragmentsMatch = output.match(/\[hlsnative\] Total fragments: (\d+)/);
       if (totalFragmentsMatch) {
-        console.log(`Total fragments: ${totalFragmentsMatch[1]}`);
+        totalFragments = parseInt(totalFragmentsMatch[1], 10);
       }
   
       // Extract current downloading fragment
       const fragmentMatch = output.match(/Downloading fragment: (\d+)\/(\d+)/);
       if (fragmentMatch) {
-        console.log(`Current fragment: ${fragmentMatch[1]} of ${fragmentMatch[2]}`);
+        const currentFragment = parseInt(fragmentMatch[1], 10);
+        
+        // Calculate the percentage
+        const percentage = (currentFragment / totalFragments) * 100;
+  
+        // To avoid logging the same fragment multiple times
+        if (currentFragment !== lastLoggedFragment) {
+          console.log(`Progress: ${percentage.toFixed(2)}% (Fragment ${currentFragment} of ${totalFragments})`);
+          lastLoggedFragment = currentFragment;
+        }
       }
     });
 
