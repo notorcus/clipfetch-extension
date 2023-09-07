@@ -15,11 +15,14 @@ const HomePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState<boolean>(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [platform, setPlatform] = useState<string | null>(null);
+  const isYouTube = platform?.toLowerCase() === 'youtube';
+  const isDrive = platform?.toLowerCase() === 'googledrive';
 
   useEffect(() => {
     if (inputValue) {
       setIsLoading(true);  // Start loading
-      getAvailableFormats(inputValue, (error, bestFormatsByResolution, bestAudioFormats, videoTitle) => {
+      getAvailableFormats(inputValue, (error, bestFormatsByResolution, bestAudioFormats, videoTitle, platform) => {
         setIsLoading(false);  // Stop loading
         if (error) {
           setMessage('Invalid Link!');
@@ -27,6 +30,8 @@ const HomePage: React.FC = () => {
         } else {
           setMessage(`${videoTitle}`);
           setHasError(false); 
+          setPlatform(platform || null);
+          console.log(platform);
           // console.log("Best audio formats received:", bestAudioFormats);
   
           // Set video options
@@ -62,11 +67,11 @@ const HomePage: React.FC = () => {
             {Object.keys(videoOptions).length > 0 && (
               <QualityDropdown 
                 options={Object.keys(videoOptions)} 
-                label="Video Quality" 
+                label={isYouTube ? "Video Quality" : "Resolution"} 
                 onSelect={(selected) => setSelectedVideoFormat(videoOptions[selected])} 
               />
             )}
-            {Object.keys(audioOptions).length > 0 && (
+            {isYouTube && Object.keys(audioOptions).length > 0 && (
               <QualityDropdown 
                 options={Object.keys(audioOptions)} 
                 label="Audio Quality" 
@@ -74,13 +79,23 @@ const HomePage: React.FC = () => {
               />
             )}
           </div>
-          {/* Show DownloadButton only if both dropdowns have options */}
-          {(Object.keys(videoOptions).length > 0 && Object.keys(audioOptions).length > 0) && (
+          {isYouTube && Object.keys(videoOptions).length > 0 && Object.keys(audioOptions).length > 0 && (
             <div className="download-button-container">
               <DownloadButton 
                 inputValue={inputValue} 
                 videoFormatId={selectedVideoFormat} 
                 audioFormatId={selectedAudioFormat} 
+                platform={platform}
+              />
+            </div>
+          )}
+          {isDrive && Object.keys(videoOptions).length > 0 && (
+            <div className="download-button-container">
+              <DownloadButton 
+                inputValue={inputValue} 
+                videoFormatId={selectedVideoFormat} 
+                audioFormatId={selectedAudioFormat} 
+                platform={platform}
               />
             </div>
           )}

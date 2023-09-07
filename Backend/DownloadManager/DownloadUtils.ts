@@ -3,7 +3,7 @@ import { spawn } from 'child_process';
 
 const csInterface = new CSInterface();
 
-const getAvailableFormats = (url: string, callback: (error: any, videoData?: any, audioData?: any, videoTitle?: string) => void) => {
+const getAvailableFormats = (url: string, callback: (error: any, videoData?: any, audioData?: any, videoTitle?: string, platform?: string) => void) => {
   const ytDlp = spawn('yt-dlp', ['--dump-json', url]);
   let output = '';
   let errorOutput = '';
@@ -24,6 +24,7 @@ const getAvailableFormats = (url: string, callback: (error: any, videoData?: any
     try {
       const parsedData = JSON.parse(output);
       const videoTitle = parsedData.title || "Unknown Title";
+      const platform = parsedData.extractor_key || "Unknown Platform";
       const availableFormats = parsedData.formats || [];
     
       const formatsByResolution = groupFormatsByResolution(availableFormats);
@@ -32,7 +33,7 @@ const getAvailableFormats = (url: string, callback: (error: any, videoData?: any
       const audioFormats = availableFormats.filter((format: any) => format.acodec !== 'none');
       const bestAudioFormats = getBestAudioFormats(audioFormats);
     
-      callback(null, bestFormatsByResolution, bestAudioFormats, videoTitle);
+      callback(null, bestFormatsByResolution, bestAudioFormats, videoTitle, platform);
     } catch (err) {
       callback(err);
     }
@@ -93,15 +94,18 @@ const getBestAudioFormats = (audioFormats: any[]) => {
   return bestAudioFormats;
 };
 
-const downloadStream = (url: string, formatId: string, outputPath: string): Promise<{absFilePath: string, fileName: string}> => {
+const downloadStream = (
+  url: string, 
+  formatId: string, 
+  outputPath: string, 
+  videoTitle: string | null = null
+): Promise<{absFilePath: string, fileName: string}> => {
   return new Promise((resolve, reject) => {
-    // Variables to accumulate stderr data and stdout data for filename
     let stderrData = '';
     let stdoutData = '';
 
-    // Generate a unique ID and filename
-    const uniqueID = generateRandomString(8);  // 8-character long random string
-    const fileName = `${uniqueID}.%(ext)s`;
+    // Choose a filename based on whether videoTitle is provided
+    const fileName = videoTitle ? `${videoTitle}.%(ext)s` : `${generateRandomString(8)}.%(ext)s`;
     const tempFilePath = `${outputPath}/${fileName}`;
 
     const ytDlpDownload = spawn('yt-dlp', ['-f', formatId, url, '-o', tempFilePath]);
@@ -112,7 +116,6 @@ const downloadStream = (url: string, formatId: string, outputPath: string): Prom
 
     ytDlpDownload.on('close', async (code) => {
       if (code === 0) {
-        // After successful download, fetch the absolute filename
         const ytDlpFilename = spawn('yt-dlp', ['--get-filename', '-f', formatId, url, '-o', tempFilePath]);
         
         ytDlpFilename.stdout.on('data', (data) => {
@@ -133,6 +136,7 @@ const downloadStream = (url: string, formatId: string, outputPath: string): Prom
     });
   });
 };
+
 
 
 function generateRandomString(length: number): string {
@@ -161,7 +165,7 @@ const mergeStreams = (
 
     console.log(`Using ${videoCodec} for encoding.`);
     
-    args = ['-y', '-i', videoFile, '-i', audioFile, '-c:v', videoCodec, '-preset', 'fast', '-c:a', 'aac', '-strict', 'experimental', '-f', 'mp4', mergedFilename];    
+    args = ['-y', '-i', videoFile, '-i', audioFile, '-c:v', videoCodec, '-preset', 'slow', '-c:a', 'aac', '-strict', 'experimental', '-f', 'mp4', mergedFilename];    
 
     const ffmpeg = spawn('ffmpeg', args);
 
