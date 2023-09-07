@@ -11,23 +11,15 @@ export const downloadYT = async (inputValue: string, videoFormatId: string, audi
   console.log("Initiating download...");
 
   try {
-    const videoTitlePromise = getVideoTitle(inputValue);
-
-    const videoFilePromise = downloadStream(inputValue, videoFormatId, outputPath, null, (progress) => {
-      if (progress > 100) progress = 100;
-      console.log("Video progress:", progress);
-    });
-
-    const audioFilePromise = downloadStream(inputValue, audioFormatId, outputPath, null, (progress) => {
-      if (progress > 100) progress = 100;
-      console.log("Audio progress:", progress);
-    });
-
-    const [videoTitle, videoFileData, audioFileData] = await Promise.all([videoTitlePromise, videoFilePromise, audioFilePromise]);
-
+    const [videoTitle, videoFileData, audioFileData] = await Promise.all([
+      getVideoTitle(inputValue),
+      downloadStream(inputValue, videoFormatId, outputPath),
+      downloadStream(inputValue, audioFormatId, outputPath),
+    ]);
+  
     console.log("Video path:", videoFileData.absFilePath);
     console.log("Audio path:", audioFileData.absFilePath);
-    console.log("Video Title:", videoTitle);
+    console.log("Video Title:", videoTitle)
 
     // Merge the video and audio streams
     const mergedFilePath = await mergeStreams(

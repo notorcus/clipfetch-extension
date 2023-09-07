@@ -108,7 +108,7 @@ const downloadStream = (
     const fileName = videoTitle ? `${videoTitle}.%(ext)s` : `${generateRandomString(8)}.%(ext)s`;
     const tempFilePath = `${outputPath}/${fileName}`;
 
-    const ytDlpDownload = spawn('yt-dlp', ['-f', formatId, url, '-q', '-o', tempFilePath, '--progress']);
+    const ytDlpDownload = spawn('yt-dlp', ['-f', formatId, url, '-o', tempFilePath, "--newline", '--progress-template', '"Downloading fragment: %(progress.fragment_index)s/%(progress.fragment_count)s"']);
 
     ytDlpDownload.stderr.on('data', (data) => {
       stderrData += data;
@@ -117,16 +117,19 @@ const downloadStream = (
 
     // Capture the stdout data for download progress
     ytDlpDownload.stdout.on('data', (data) => {
-      downloadProgress = data.toString();
-    
-      const percentageMatch = downloadProgress.match(/\[download\]\s+(\d+(\.\d+)?)%/);
-      if (percentageMatch) {
-        const progressValue = parseFloat(percentageMatch[1]);
-        // console.log("Parsed progress:", progressValue);
-            
-        if (onProgress) {
-          onProgress(progressValue);
-        }
+      const output = data.toString();
+      // console.log("stdout: ", output)
+  
+      // Extract total fragments
+      const totalFragmentsMatch = output.match(/\[hlsnative\] Total fragments: (\d+)/);
+      if (totalFragmentsMatch) {
+        console.log(`Total fragments: ${totalFragmentsMatch[1]}`);
+      }
+  
+      // Extract current downloading fragment
+      const fragmentMatch = output.match(/Downloading fragment: (\d+)\/(\d+)/);
+      if (fragmentMatch) {
+        console.log(`Current fragment: ${fragmentMatch[1]} of ${fragmentMatch[2]}`);
       }
     });
 
@@ -140,7 +143,7 @@ const downloadStream = (
 
         ytDlpFilename.on('close', (code) => {
           if (code === 0) {
-            resolve({ absFilePath: stdoutData.trim(), fileName });  // Return the absolute file path and fileName
+            resolve({ absFilePath: stdoutData.trim(), fileName });
           } else {
             reject(`yt-dlp process for filename exited with code ${code}`);
           }
