@@ -16,38 +16,45 @@ const HomePage: React.FC = () => {
   const [hasError, setHasError] = useState<boolean>(false);
   const [message, setMessage] = useState<string | null>(null);
   const [platform, setPlatform] = useState<string | null>(null);
-  const isYouTube = platform?.toLowerCase() === 'youtube';
-  const isDrive = platform?.toLowerCase() === 'googledrive';
+  const isYouTube = platform?.trim().toLowerCase() === 'youtube';
+  const isDrive = platform?.trim().toLowerCase() === 'googledrive';
 
-  useEffect(() => {
-    if (inputValue) {
-      setIsLoading(true);  // Start loading
-      getAvailableFormats(inputValue, (error, bestFormatsByResolution, bestAudioFormats, videoTitle, platform) => {
-        setIsLoading(false);  // Stop loading
-        if (error) {
-          setMessage('Invalid Link!');
-          setHasError(true);  
-        } else {
-          setMessage(`${videoTitle}`);
-          setHasError(false); 
-          setPlatform(platform || null);
-          console.log(platform);
-          // console.log("Best audio formats received:", bestAudioFormats);
-  
-          // Set video options
-          const videoOpts: { [resolution: string]: string } = {};
-          Object.keys(bestFormatsByResolution).forEach(resolution => {
-            videoOpts[resolution] = bestFormatsByResolution[resolution].format_id;
-          });
-          setVideoOptions(videoOpts);
-  
-          // Set audio options
-          setAudioOptions(bestAudioFormats); 
 
+useEffect(() => {
+  if (inputValue) {
+    setIsLoading(true);  // Start loading
+    getAvailableFormats(inputValue, (error, bestFormatsByResolution, bestAudioFormats, videoTitle, platform) => {
+      setIsLoading(false);  // Stop loading
+      if (error) {
+        setMessage('Invalid Link!');
+        setHasError(true);  
+      } else {
+        setMessage(`${videoTitle}`);
+        setHasError(false); 
+        setPlatform(platform || null);
+    
+        // Derive isYouTube directly from the platform parameter, not the state
+        const currentIsYouTube = platform?.trim().toLowerCase() === 'youtube';
+    
+        // Setting video and audio options
+        setVideoOptions(bestFormatsByResolution);
+        setAudioOptions(bestAudioFormats);
+    
+        // Set the default selected formats to the highest quality options using the fetched formats directly
+        const firstVideoOptionKey = Object.keys(bestFormatsByResolution)[0];
+        setSelectedVideoFormat(bestFormatsByResolution[firstVideoOptionKey]);
+        console.log('Default Video Format ID:', bestFormatsByResolution[firstVideoOptionKey]);
+
+        if (currentIsYouTube) {
+            const firstAudioOptionKey = Object.keys(bestAudioFormats)[0];
+            setSelectedAudioFormat(bestAudioFormats[firstAudioOptionKey]);
+            console.log('Default Audio Format ID:', bestAudioFormats[firstAudioOptionKey]);
         }
-      });
-    }
-  }, [inputValue]);
+      }
+    });
+  }
+}, [inputValue]);
+
   
 
   const handleInputChange = (newValue: string) => {

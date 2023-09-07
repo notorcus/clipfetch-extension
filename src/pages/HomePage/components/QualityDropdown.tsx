@@ -1,5 +1,5 @@
 // QualityDropdown.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './QualityDropdown.css';
 
 interface QualityDropdownProps {
@@ -12,11 +12,15 @@ const QualityDropdown: React.FC<QualityDropdownProps> = ({ options, label, onSel
   const [selectedOption, setSelectedOption] = useState(options[0]);
   const [isOpen, setIsOpen] = useState(false);
 
+  useEffect(() => {
+    // Update the selected option whenever the options prop changes
+    setSelectedOption(options[0]);
+  }, [options]);
+
   const handleOptionClick = (option: string) => {
     setSelectedOption(option);
     setIsOpen(false);
     onSelect(option);
-
   };
 
   return (

@@ -20,8 +20,6 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({ inputValue, videoFormat
       console.log("Input field is empty.");
       return;
     }
-    
-    console.log("Download button clicked. Input value:", inputValue);
 
     try {
       if (platform?.toLowerCase() === 'youtube') {
