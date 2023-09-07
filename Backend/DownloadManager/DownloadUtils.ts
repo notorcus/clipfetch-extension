@@ -97,20 +97,37 @@ const downloadStream = (
   url: string, 
   formatId: string, 
   outputPath: string, 
-  videoTitle: string | null = null
+  videoTitle: string | null = null,
+  onProgress?: (progress: number) => void
 ): Promise<{absFilePath: string, fileName: string}> => {
   return new Promise((resolve, reject) => {
     let stderrData = '';
     let stdoutData = '';
+    let downloadProgress = '';  // <-- Variable to store download progress data
 
-    // Choose a filename based on whether videoTitle is provided
     const fileName = videoTitle ? `${videoTitle}.%(ext)s` : `${generateRandomString(8)}.%(ext)s`;
     const tempFilePath = `${outputPath}/${fileName}`;
 
-    const ytDlpDownload = spawn('yt-dlp', ['-f', formatId, url, '-o', tempFilePath]);
+    const ytDlpDownload = spawn('yt-dlp', ['-f', formatId, url, '-q', '-o', tempFilePath, '--progress']);
 
     ytDlpDownload.stderr.on('data', (data) => {
       stderrData += data;
+      console.log("yt-dlp stderr data:", data.toString());
+    });
+
+    // Capture the stdout data for download progress
+    ytDlpDownload.stdout.on('data', (data) => {
+      downloadProgress = data.toString();
+    
+      const percentageMatch = downloadProgress.match(/\[download\]\s+(\d+(\.\d+)?)%/);
+      if (percentageMatch) {
+        const progressValue = parseFloat(percentageMatch[1]);
+        // console.log("Parsed progress:", progressValue);
+            
+        if (onProgress) {
+          onProgress(progressValue);
+        }
+      }
     });
 
     ytDlpDownload.on('close', async (code) => {
@@ -135,8 +152,6 @@ const downloadStream = (
     });
   });
 };
-
-
 
 function generateRandomString(length: number): string {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -164,7 +179,7 @@ const mergeStreams = (
 
     console.log(`Using ${videoCodec} for encoding.`);
     
-    args = ['-y', '-i', videoFile, '-i', audioFile, '-c:v', videoCodec, '-preset', 'slow', '-c:a', 'aac', '-strict', 'experimental', '-f', 'mp4', mergedFilename];    
+    args = ['-y', '-i', videoFile, '-i', audioFile, '-c:v', videoCodec, '-preset', 'fast', '-c:a', 'aac', '-strict', 'experimental', '-f', 'mp4', mergedFilename];    
 
     const ffmpeg = spawn('ffmpeg', args);
 

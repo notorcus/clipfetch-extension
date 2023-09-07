@@ -11,15 +11,23 @@ export const downloadYT = async (inputValue: string, videoFormatId: string, audi
   console.log("Initiating download...");
 
   try {
-    const [videoTitle, videoFileData, audioFileData] = await Promise.all([
-      getVideoTitle(inputValue),
-      downloadStream(inputValue, videoFormatId, outputPath),
-      downloadStream(inputValue, audioFormatId, outputPath),
-    ]);
-  
+    const videoTitlePromise = getVideoTitle(inputValue);
+
+    const videoFilePromise = downloadStream(inputValue, videoFormatId, outputPath, null, (progress) => {
+      if (progress > 100) progress = 100;
+      console.log("Video progress:", progress);
+    });
+
+    const audioFilePromise = downloadStream(inputValue, audioFormatId, outputPath, null, (progress) => {
+      if (progress > 100) progress = 100;
+      console.log("Audio progress:", progress);
+    });
+
+    const [videoTitle, videoFileData, audioFileData] = await Promise.all([videoTitlePromise, videoFilePromise, audioFilePromise]);
+
     console.log("Video path:", videoFileData.absFilePath);
     console.log("Audio path:", audioFileData.absFilePath);
-    console.log("Video Title:", videoTitle)
+    console.log("Video Title:", videoTitle);
 
     // Merge the video and audio streams
     const mergedFilePath = await mergeStreams(
@@ -57,7 +65,7 @@ export const downloadDrive = async (inputValue: string, videoFormatId: string, o
     const lastDotIndex = videoTitle.lastIndexOf('.');
     const titleWithoutExtension = (lastDotIndex !== -1) ? videoTitle.substring(0, lastDotIndex) : videoTitle;
     
-    console.log("Video Title without extension:", titleWithoutExtension);
+    console.log("Video Title:", titleWithoutExtension);
   
     // Then download the video stream using the title without extension
     const videoFileData = await downloadStream(inputValue, videoFormatId, outputPath, titleWithoutExtension);
