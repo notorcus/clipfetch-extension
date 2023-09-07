@@ -52,10 +52,15 @@ export const downloadDrive = async (inputValue: string, videoFormatId: string, o
   try {
     // Get the video title first
     const videoTitle = await getVideoTitle(inputValue);
-    console.log("Video Title:", videoTitle)
+    
+    // Remove the extension from the video title
+    const lastDotIndex = videoTitle.lastIndexOf('.');
+    const titleWithoutExtension = (lastDotIndex !== -1) ? videoTitle.substring(0, lastDotIndex) : videoTitle;
+    
+    console.log("Video Title without extension:", titleWithoutExtension);
   
-    // Then download the video stream using the video title
-    const videoFileData = await downloadStream(inputValue, videoFormatId, outputPath, videoTitle);
+    // Then download the video stream using the title without extension
+    const videoFileData = await downloadStream(inputValue, videoFormatId, outputPath, titleWithoutExtension);
   
     console.log("Video path:", videoFileData.absFilePath);
     
