@@ -1,12 +1,13 @@
 // ProgressDashboard.tsx
 import React, { useState, useEffect } from 'react';
 import DownloadCard from './DownloadCard';
+import DownloadStateIcon from './DownloadStateIcon';
 import './DashboardStyles.css';
 
 interface Video {
   title: string;
   progress: number;
-  status: string; // can be 'downloading', 'completed', 'failed'
+  status: 'downloading' | 'completed' | 'failed';
 }
 
 interface ProgressDashboardProps {

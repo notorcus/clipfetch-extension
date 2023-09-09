@@ -1,0 +1,60 @@
+/* DownloadStateIcon.css */
+.state-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.state-icon.downloading {
+    position: relative;
+    border: 2px solid #A2A2A2;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.state-icon.downloading::before,
+.state-icon.downloading::after {
+    content: "";
+    position: absolute;
+    width: 3px; 
+    height: 50%; 
+    background-color: #A2A2A2;
+    top: 50%;
+    left: 50%;
+    transform-origin: center;
+    transition: 100ms ease;
+}
+
+
+.state-icon.completed {
+    background-color: #27ae60;
+}
+
+.state-icon.failed {
+    background-color: #c0392b;
+}
+
+
+/* cross and animation */
+
+.state-icon.downloading::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.state-icon.downloading::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.state-icon.downloading:hover::before,
+.state-icon.downloading:hover::after {
+    background-color: #dddddd;
+}
+
+.state-icon.downloading:hover::after {
+    background-color: #dddddd;
+}
