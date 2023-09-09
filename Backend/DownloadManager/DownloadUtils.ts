@@ -133,7 +133,7 @@ const downloadStream = (
         const currentFragment = parseInt(fragmentMatch[1], 10);
         
         // If current fragment is the last fragment, skip logging and callback
-        if (currentFragment === totalFragments) {
+        if ((currentFragment - 1) === totalFragments) {
           return;
         }
   
@@ -142,7 +142,7 @@ const downloadStream = (
   
         // To avoid logging the same fragment multiple times
         if (currentFragment !== lastLoggedFragment) {
-          console.log(`Progress: ${percentage.toFixed(2)}% (Fragment ${currentFragment} of ${totalFragments})`);
+          // console.log(`Progress: ${percentage.toFixed(2)}% (Fragment ${currentFragment} of ${totalFragments})`);
           lastLoggedFragment = currentFragment;
   
           // Passing the percentage to the callback

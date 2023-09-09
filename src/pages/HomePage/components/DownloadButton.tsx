@@ -1,7 +1,7 @@
 // DownloadButton.tsx
 import React, { useContext } from 'react';
 import { downloadDrive, downloadYT } from '../../../../backend/DownloadManager/Main';
-import { DownloadSettingsContext } from '../../../DownloadSettingsContext';  // Update this import path
+import { DownloadSettingsContext } from '../../../DownloadSettingsContext'; 
 import './DownloadButton.css';
 
 interface DownloadButtonProps {
@@ -23,7 +23,9 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({ inputValue, videoFormat
 
     try {
       if (platform?.toLowerCase() === 'youtube') {
-        await downloadYT(inputValue, videoFormatId, audioFormatId, outputPath);
+        await downloadYT(inputValue, videoFormatId, audioFormatId, outputPath, (progress) => {
+          console.log(`Video Download Progress: ${progress.toFixed(0)}%`);
+        });
       } else if (platform?.toLowerCase() === 'googledrive') {
         await downloadDrive(inputValue, videoFormatId, outputPath);
       }

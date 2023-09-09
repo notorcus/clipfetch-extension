@@ -1,22 +1,27 @@
 // Main.ts
 import { downloadStream, mergeStreams, deleteFile, importFile, getVideoTitle } from "./DownloadUtils";
 
-export const downloadYT = async (inputValue: string, videoFormatId: string, audioFormatId: string, outputPath: string) => {
+export const downloadYT = async (
+  inputValue: string,
+  videoFormatId: string,
+  audioFormatId: string,
+  outputPath: string,
+  onProgress?: (progress: number) => void
+) => {
   if (inputValue === '') {
     console.log("Input field is empty.");
     return;
   }
-  console.log("Download button clicked. Input value:", inputValue);
-
+  // console.log("Download button clicked. Input value:", inputValue);
   console.log("Initiating download...");
 
   try {
     const [videoTitle, videoFileData, audioFileData] = await Promise.all([
       getVideoTitle(inputValue),
-      downloadStream(inputValue, videoFormatId, outputPath),
-      downloadStream(inputValue, audioFormatId, outputPath),
+      downloadStream(inputValue, videoFormatId, outputPath, null, onProgress),
+      downloadStream(inputValue, audioFormatId, outputPath)
     ]);
-  
+    
     console.log("Video path:", videoFileData.absFilePath);
     console.log("Audio path:", audioFileData.absFilePath);
     console.log("Video Title:", videoTitle)
