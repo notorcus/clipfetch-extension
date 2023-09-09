@@ -6,19 +6,45 @@ import ProgressButton from './components/ProgressDashboard/ProgressButton';
 import ProgressDashboard from './components/ProgressDashboard/ProgressDashboard';
 import { DownloadSettingsProvider } from './DownloadSettingsContext';
 
+interface Video {
+  title: string;
+  progress: number;
+  status: 'downloading' | 'completed' | 'failed';
+}
+
 function App() {
   const [showDashboard, setShowDashboard] = useState(false);
+  const [videos, setVideos] = useState<Video[]>([]);
+
+  const handleProgressUpdate = (title: string, progress: number) => {
+    console.log(`Received progress update: ${progress}% for video: ${title}`);
+    setVideos(prevVideos => prevVideos.map(video => video.title === title ? { ...video, progress } : video));
+  };
+
+  const handleNewVideoDownload = (title: string) => {
+    console.log(`Received a new download request for video: ${title}`);
+    setVideos(prevVideos => [...prevVideos, { title, progress: 0, status: 'downloading' }]);
+  };
 
   return (
     <DownloadSettingsProvider>
       <div className="main-container">
-        <HomePage />
+        <HomePage 
+          onProgressUpdate={(title, progress) => {
+            console.log(`HomePage received progress update: ${progress}% for video: ${title}`);
+            handleProgressUpdate(title, progress);
+          }}
+          onNewVideoDownload={(title) => {
+            console.log(`HomePage received a new download request for video: ${title}`);
+            handleNewVideoDownload(title);
+          }}
+        />
         <div className="download-progress-container">
           <ProgressButton 
             onClick={() => setShowDashboard(prevState => !prevState)} 
             showDashboard={showDashboard}
           />
-          <ProgressDashboard isOpen={showDashboard} />
+          <ProgressDashboard isOpen={showDashboard} externalVideos={videos} />
         </div>
       </div>
     </DownloadSettingsProvider>

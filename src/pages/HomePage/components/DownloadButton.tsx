@@ -1,6 +1,7 @@
 // DownloadButton.tsx
 import React, { useContext } from 'react';
 import { downloadDrive, downloadYT } from '../../../../backend/DownloadManager/Main';
+import { getVideoTitle } from '../../../../backend/DownloadManager/DownloadUtils';
 import { DownloadSettingsContext } from '../../../DownloadSettingsContext'; 
 import './DownloadButton.css';
 
@@ -9,9 +10,15 @@ interface DownloadButtonProps {
   videoFormatId: string;
   audioFormatId: string;
   platform: string | null;
+  onProgressUpdate: (title: string, progress: number) => void;
+  onNewVideoDownload: (title: string) => void;
 }
 
-const DownloadButton: React.FC<DownloadButtonProps> = ({ inputValue, videoFormatId, audioFormatId, platform }) => {
+const DownloadButton: React.FC<DownloadButtonProps> = ({
+  inputValue, videoFormatId, audioFormatId, platform, 
+  onProgressUpdate, onNewVideoDownload
+}) => {
+
   const [settings] = useContext(DownloadSettingsContext);
   const { outputPath } = settings;
 
@@ -23,8 +30,12 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({ inputValue, videoFormat
 
     try {
       if (platform?.toLowerCase() === 'youtube') {
+        const videoTitle = await getVideoTitle(inputValue);
+        console.log(`Sending new download request for video: ${videoTitle}`);
+        onNewVideoDownload(videoTitle);
+
         await downloadYT(inputValue, videoFormatId, audioFormatId, outputPath, (progress) => {
-          console.log(`Video Download Progress: ${progress.toFixed(0)}%`);
+          onProgressUpdate(videoTitle, progress);
         });
       } else if (platform?.toLowerCase() === 'googledrive') {
         await downloadDrive(inputValue, videoFormatId, outputPath);
