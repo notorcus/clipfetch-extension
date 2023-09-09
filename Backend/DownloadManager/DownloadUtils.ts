@@ -1,5 +1,5 @@
 // DownloadUtils.ts
-import { spawn } from 'child_process';
+import { exec, spawn } from 'child_process';
 
 const csInterface = new CSInterface();
 
@@ -195,32 +195,88 @@ const mergeStreams = (
     const mergedFilename = `${outputPath}/${title}.mp4`;
 
     // For now, we'll assume NVENC support is true for faster development
-    const supportsNvenc = true;  
-    let args;
-    
+    const supportsNvenc = true;
     const videoCodec = supportsNvenc ? 'h264_nvenc' : 'libx264';
 
     console.log(`Using ${videoCodec} for encoding.`);
-    
-    args = ['-y', '-i', videoFile, '-i', audioFile, '-c:v', videoCodec, '-preset', 'fast', '-c:a', 'aac', '-strict', 'experimental', '-f', 'mp4', mergedFilename];    
 
-    const ffmpeg = spawn('ffmpeg', args);
+    // Getting the total number of frames using ffprobe and spawn
+    const ffprobeArgs = [
+      '-v', 'error',
+      '-select_streams', 'v:0',
+      '-count_packets',
+      '-show_entries', 'stream=nb_read_packets',
+      '-of', 'csv=p=0',
+      videoFile
+    ];
+    const ffprobe = spawn('ffprobe', ffprobeArgs);
 
-    let errorData = '';
-    ffmpeg.stderr.on('data', (data) => {
-      errorData += data;
+    let frameData = '';
+    ffprobe.stdout.on('data', (data) => {
+      frameData += data.toString();
     });
 
-    ffmpeg.on('close', (code) => {
+    ffprobe.on('close', (code) => {
       if (code !== 0) {
-        console.log("Error output:", errorData);
-        reject(new Error(errorData));
+        reject(new Error("Error getting total frames."));
+        return;
+      }
+
+      const totalFrames = parseInt(frameData.trim(), 10);
+      if (isNaN(totalFrames)) {
+        reject(new Error("Couldn't parse total frames from ffprobe output."));
+        return;
+      }
+
+      // Proceed with the ffmpeg logic for merging streams
+      const args = ['-y', '-i', videoFile, '-i', audioFile, '-c:v', videoCodec, '-preset', 'fast', '-c:a', 'aac', '-strict', 'experimental', '-f', 'mp4', '-loglevel', 'info', mergedFilename];
+
+      const ffmpeg = spawn('ffmpeg', args);
+
+      let errorData = '';
+      ffmpeg.stderr.on('data', (data) => {
+        errorData += data;
+
+        // Process and filter the logs here for frame updates
+        const logString = data.toString();
+        if (logString.includes('frame=')) {
+          const frameMatch = logString.match(/frame=\s*(\d+)/);
+          if (frameMatch && frameMatch[1]) {
+            const currentFrame = parseInt(frameMatch[1], 10);
+            const percentageProcessed = (currentFrame / totalFrames) * 100;
+            console.log(`Processed: ${percentageProcessed.toFixed(2)}%`);
+          }
+        }
+      });
+
+      ffmpeg.on('close', (ffmpegCode) => {
+        if (ffmpegCode !== 0) {
+          reject(new Error(errorData));
+        } else {
+          resolve(mergedFilename);
+        }
+      });
+    });
+  });
+};
+
+const getTotalFrames = (videoFile: string, audioFile: string, videoCodec: string): Promise<number> => {
+  return new Promise((resolve, reject) => {
+    // Prepare the ffprobe command
+    const cmd = `ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=nokey=1:noprint_wrappers=1 -i "${videoFile}"`;
+
+    exec(cmd, (error, stdout, stderr) => {
+      if (error) {
+        reject(error);
       } else {
-        resolve(mergedFilename);
+        // Parse the number of frames from the output
+        const totalFrames = parseInt(stdout.trim(), 10);
+        resolve(totalFrames);
       }
     });
   });
 };
+
 
  function deleteFile(filePath: string) {
   csInterface.evalScript(`$.runScript.deleteFile("${filePath.replace(/\\/g, '/')}")`, function(result: string) {
