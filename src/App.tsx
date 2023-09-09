@@ -17,12 +17,10 @@ function App() {
   const [videos, setVideos] = useState<Video[]>([]);
 
   const handleProgressUpdate = (title: string, progress: number) => {
-    console.log(`Received progress update: ${progress}% for video: ${title}`);
     setVideos(prevVideos => prevVideos.map(video => video.title === title ? { ...video, progress } : video));
   };
 
   const handleNewVideoDownload = (title: string) => {
-    console.log(`Received a new download request for video: ${title}`);
     setVideos(prevVideos => [...prevVideos, { title, progress: 0, status: 'downloading' }]);
   };
 
@@ -31,11 +29,9 @@ function App() {
       <div className="main-container">
         <HomePage 
           onProgressUpdate={(title, progress) => {
-            console.log(`HomePage received progress update: ${progress}% for video: ${title}`);
             handleProgressUpdate(title, progress);
           }}
           onNewVideoDownload={(title) => {
-            console.log(`HomePage received a new download request for video: ${title}`);
             handleNewVideoDownload(title);
           }}
         />
