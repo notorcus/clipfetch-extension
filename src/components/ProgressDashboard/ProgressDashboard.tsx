@@ -46,15 +46,19 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ isOpen }) => {
     }, intervalTime);
 };
 
-  const handleStatusChange = (videoTitle: string, newStatus: 'downloading' | 'completed' | 'failed' | 'cancelled') => {
-    setVideos(prevVideos => {
-      return prevVideos.map(video => {
-        if (video.title === videoTitle) {
-          return { ...video, status: newStatus };
-        }
-        return video;
+  const handleStatusChange = (videoTitle: string, newStatus: 'downloading' | 'completed' | 'failed' | 'cancelled' | 'removed') => {
+    if (newStatus === 'removed') {
+      setVideos(prevVideos => prevVideos.filter(video => video.title !== videoTitle));
+    } else {
+      setVideos(prevVideos => {
+        return prevVideos.map(video => {
+          if (video.title === videoTitle) {
+            return { ...video, status: newStatus };
+          }
+          return video;
+        });
       });
-    });
+    }
   }
 
   return (

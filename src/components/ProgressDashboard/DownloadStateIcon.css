@@ -28,7 +28,6 @@
     transition: 100ms ease;
 }
 
-
 .state-icon.completed {
     position: relative;
     background-color: #4c4c4c;
@@ -36,6 +35,11 @@
     width: 24px;  /* Adjust width and height as needed */
     height: 24px;
     border: 2px solid transparent;
+    transition: 50ms ease;
+}
+
+.state-icon.completed:hover {
+    background-color: #c0392b;
 }
 
 .state-icon.completed::after {
@@ -50,6 +54,28 @@
     transform: rotate(45deg);
 }
 
+/* cross icon for the completed state on hover */
+.state-icon.completed:hover::before,
+.state-icon.completed:hover::after {
+    content: "";
+    position: absolute;
+    width: 3px;
+    height: 50%;
+    background-color: white;
+    top: 50%;
+    left: 50%;
+    transform-origin: center;
+    border: none;
+}
+
+.state-icon.completed:hover::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.state-icon.completed:hover::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
 .state-icon.failed {
     background-color: #c0392b;
 }
@@ -58,7 +84,6 @@
     background-color: #c0392b;
     border: 2px solid transparent;
 }
-
 
 /* cross and animation */
 
