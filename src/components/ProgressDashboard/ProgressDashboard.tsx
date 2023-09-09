@@ -15,16 +15,22 @@ interface ProgressDashboardProps {
 }
 
 const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ isOpen, externalVideos }) => {
-  const [videos, setVideos] = useState<Video[]>(externalVideos); 
+  const [videos, setVideos] = useState<Video[]>([]); 
 
   useEffect(() => {
-    console.log('Received new externalVideos:', externalVideos);
-    setVideos(externalVideos);
+    setVideos(prevVideos => {
+      return externalVideos.map(externalVideo => {
+        const matchingVideo = prevVideos.find(video => video.title === externalVideo.title);
+        
+        if (externalVideo.progress >= 100) {
+          return { ...externalVideo, status: 'completed' };
+        } else if (matchingVideo) {
+          return { ...matchingVideo, ...externalVideo }; // Merge with previous video data
+        }
+        return externalVideo;
+      });
+    });
   }, [externalVideos]);  
-
-  useEffect(() => {
-    console.log('Local videos state updated:', videos);
-  }, [videos]);  
 
   const handleStatusChange = (videoTitle: string, newStatus: 'downloading' | 'completed' | 'failed' | 'cancelled' | 'removed') => {
     if (newStatus === 'removed') {
