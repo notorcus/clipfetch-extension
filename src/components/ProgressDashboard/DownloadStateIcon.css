@@ -39,6 +39,11 @@
     background-color: #c0392b;
 }
 
+.state-icon.cancelled {
+    background-color: #c0392b;
+    border: 2px solid transparent;
+}
+
 
 /* cross and animation */
 

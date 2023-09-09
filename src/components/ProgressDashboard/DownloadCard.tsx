@@ -1,23 +1,24 @@
-// FileDownloadCard.tsx
+// DownloadCard.tsx
 import React from 'react';
 import ProgressBar from './ProgressBar';
 import './DownloadCard.css';
 import DownloadStateIcon from './DownloadStateIcon';
 
-interface FileDownloadCardProps {
+interface DownloadCardProps {
   video: {
     title: string;
     progress: number;
-    status: 'downloading' | 'completed' | 'failed';
+    status: 'downloading' | 'completed' | 'failed'| 'cancelled';
   };
+  onStatusChange: (status: 'downloading' | 'completed' | 'failed' | 'cancelled') => void;
 }
 
-const DownloadCard: React.FC<FileDownloadCardProps> = ({ video }) => {
+const DownloadCard: React.FC<DownloadCardProps> = ({ video, onStatusChange }) => {
 
   const handleCancel = () => {
-    // Logic to cancel the video download goes here
-    // For now, it's a placeholder function
     console.log(`Cancelling download for ${video.title}`);
+    onStatusChange('cancelled');
+
   };
 
   return (

@@ -7,7 +7,7 @@ import './DashboardStyles.css';
 interface Video {
   title: string;
   progress: number;
-  status: 'downloading' | 'completed' | 'failed';
+  status: 'downloading' | 'completed' | 'failed'| 'cancelled';
 }
 
 interface ProgressDashboardProps {
@@ -27,11 +27,26 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ isOpen }) => {
     setVideos(prevVideos => [...prevVideos, dummyVideo]);
   };
 
+  const handleStatusChange = (videoTitle: string, newStatus: 'downloading' | 'completed' | 'failed' | 'cancelled') => {
+    setVideos(prevVideos => {
+      return prevVideos.map(video => {
+        if (video.title === videoTitle) {
+          return { ...video, status: newStatus };
+        }
+        return video;
+      });
+    });
+  }
+
   return (
     <div className={`progress-dashboard ${isOpen ? "visible" : "hidden"}`}>
       <button onClick={addDummyVideo}>Add Dummy Video</button>
       {videos.map(video => (
-        <DownloadCard key={video.title} video={video} />
+        <DownloadCard 
+          key={video.title} 
+          video={video} 
+          onStatusChange={(newStatus) => handleStatusChange(video.title, newStatus)} 
+        />
       ))}
     </div>
   );

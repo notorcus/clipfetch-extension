@@ -3,8 +3,8 @@ import React from 'react';
 import './DownloadStateIcon.css';
 
 interface DownloadStateIconProps {
-  state: 'downloading' | 'completed' | 'failed';
-  onCancel?: () => void;  // Callback for when the icon is clicked during the 'downloading' state
+  state: 'downloading' | 'completed' | 'failed' | 'cancelled';
+  onCancel: () => void;
 }
 
 const DownloadStateIcon: React.FC<DownloadStateIconProps> = ({ state, onCancel }) => {
@@ -15,7 +15,14 @@ const DownloadStateIcon: React.FC<DownloadStateIconProps> = ({ state, onCancel }
   };
 
   return (
-    <div className={`state-icon ${state}`} onClick={handleIconClick}>
+    <div 
+        className={`state-icon ${state}`}
+        onClick={() => {
+            if (state === 'downloading') {
+            onCancel();
+            }
+        }}
+    >
       {/* The actual icon will be set using CSS */}
     </div>
   );
