@@ -1,7 +1,6 @@
 // ProgressDashboard.tsx
 import React, { useState, useEffect } from 'react';
 import DownloadCard from './DownloadCard';
-import DownloadStateIcon from './DownloadStateIcon';
 import './DashboardStyles.css';
 
 interface Video {
@@ -12,39 +11,20 @@ interface Video {
 
 interface ProgressDashboardProps {
   isOpen: boolean;
+  externalVideos: Video[];
 }
 
-const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ isOpen }) => {
-  const [videos, setVideos] = useState<Video[]>([]);
+const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ isOpen, externalVideos }) => {
+  const [videos, setVideos] = useState<Video[]>(externalVideos); 
 
-  const addDummyVideo = () => {
-    const dummyVideo: Video = {
-      title: `Dummy Video ${videos.length + 1}`,
-      progress: 0, 
-      status: 'downloading'
-    };
+  useEffect(() => {
+    console.log('Received new externalVideos:', externalVideos);
+    setVideos(externalVideos);
+  }, [externalVideos]);  
 
-    setVideos(prevVideos => [...prevVideos, dummyVideo]);
-
-    const intervalTime = Math.random() * 250 + 100; // Random interval between 0.5s to 1.5s
-    const incrementAmount = Math.random() * 25 + 1; // Random progress increment between 1 and 5
-
-    const interval = setInterval(() => {
-      setVideos(prevVideos => {
-        return prevVideos.map(video => {
-          if (video.title === dummyVideo.title) {
-            const newProgress = video.progress + incrementAmount > 100 ? 100 : video.progress + incrementAmount;
-            if (newProgress === 100) {
-              clearInterval(interval);
-              return { ...video, progress: 100, status: 'completed' };
-            }
-            return { ...video, progress: newProgress };
-          }
-          return video;
-        });
-      });
-    }, intervalTime);
-};
+  useEffect(() => {
+    console.log('Local videos state updated:', videos);
+  }, [videos]);  
 
   const handleStatusChange = (videoTitle: string, newStatus: 'downloading' | 'completed' | 'failed' | 'cancelled' | 'removed') => {
     if (newStatus === 'removed') {
@@ -63,7 +43,6 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ isOpen }) => {
 
   return (
     <div className={`progress-dashboard ${isOpen ? "visible" : "hidden"}`}>
-      <button onClick={addDummyVideo}>Add Dummy Video</button>
       {videos.map(video => (
         <DownloadCard 
           key={video.title} 
