@@ -189,18 +189,17 @@ const mergeStreams = (
   videoFile: string, 
   audioFile: string, 
   outputPath: string,
-  title: string
+  title: string,
+  onProgress?: (progress: number) => void  // Add this callback
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     const mergedFilename = `${outputPath}/${title}.mp4`;
 
-    // For now, we'll assume NVENC support is true for faster development
     const supportsNvenc = true;
     const videoCodec = supportsNvenc ? 'h264_nvenc' : 'libx264';
 
     console.log(`Using ${videoCodec} for encoding.`);
 
-    // Getting the total number of frames using ffprobe and spawn
     const ffprobeArgs = [
       '-v', 'error',
       '-select_streams', 'v:0',
@@ -228,7 +227,6 @@ const mergeStreams = (
         return;
       }
 
-      // Proceed with the ffmpeg logic for merging streams
       const args = ['-y', '-i', videoFile, '-i', audioFile, '-c:v', videoCodec, '-preset', 'fast', '-c:a', 'aac', '-strict', 'experimental', '-f', 'mp4', '-loglevel', 'info', mergedFilename];
 
       const ffmpeg = spawn('ffmpeg', args);
@@ -237,14 +235,17 @@ const mergeStreams = (
       ffmpeg.stderr.on('data', (data) => {
         errorData += data;
 
-        // Process and filter the logs here for frame updates
         const logString = data.toString();
         if (logString.includes('frame=')) {
           const frameMatch = logString.match(/frame=\s*(\d+)/);
           if (frameMatch && frameMatch[1]) {
             const currentFrame = parseInt(frameMatch[1], 10);
             const percentageProcessed = (currentFrame / totalFrames) * 100;
-            console.log(`Processed: ${percentageProcessed.toFixed(2)}%`);
+
+            // Invoke the callback with the percentage processed
+            if (onProgress) {
+              onProgress(percentageProcessed);
+            }
           }
         }
       });
