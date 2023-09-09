@@ -3,13 +3,11 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    cursor: pointer;
 }
 
 .state-icon.downloading {
     position: relative;
     border: 2px solid #A2A2A2;
-    cursor: pointer;
     width: 24px;
     height: 24px;
     display: inline-flex;
@@ -32,7 +30,24 @@
 
 
 .state-icon.completed {
-    background-color: #27ae60;
+    position: relative;
+    background-color: #4c4c4c;
+    border-radius: 50%;
+    width: 24px;  /* Adjust width and height as needed */
+    height: 24px;
+    border: 2px solid transparent;
+}
+
+.state-icon.completed::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    top: 5px;
+    left: 8px;
+    transform: rotate(45deg);
 }
 
 .state-icon.failed {

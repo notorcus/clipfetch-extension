@@ -20,12 +20,31 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ isOpen }) => {
   const addDummyVideo = () => {
     const dummyVideo: Video = {
       title: `Dummy Video ${videos.length + 1}`,
-      progress: Math.floor(Math.random() * 101), // Random progress between 0 and 100
+      progress: 0, 
       status: 'downloading'
     };
 
     setVideos(prevVideos => [...prevVideos, dummyVideo]);
-  };
+
+    const intervalTime = Math.random() * 250 + 100; // Random interval between 0.5s to 1.5s
+    const incrementAmount = Math.random() * 25 + 1; // Random progress increment between 1 and 5
+
+    const interval = setInterval(() => {
+      setVideos(prevVideos => {
+        return prevVideos.map(video => {
+          if (video.title === dummyVideo.title) {
+            const newProgress = video.progress + incrementAmount > 100 ? 100 : video.progress + incrementAmount;
+            if (newProgress === 100) {
+              clearInterval(interval);
+              return { ...video, progress: 100, status: 'completed' };
+            }
+            return { ...video, progress: newProgress };
+          }
+          return video;
+        });
+      });
+    }, intervalTime);
+};
 
   const handleStatusChange = (videoTitle: string, newStatus: 'downloading' | 'completed' | 'failed' | 'cancelled') => {
     setVideos(prevVideos => {
