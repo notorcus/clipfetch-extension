@@ -1,6 +1,7 @@
 .progress-dashboard {
   /* Dimensions */
-  width: 100vw; /* full viewport width */
+  width: 100vw;
+  box-sizing: border-box;
   height: 200px;
   
   /* Positioning */
@@ -13,10 +14,11 @@
   background-color: #1E1E1E;
   color: #bbbbbb;
   border: 2px solid 1C1C1C;
+  padding: 20px;
   
   /* Centering the text */
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
   
   /* Transition for smooth appearance */
@@ -33,24 +35,20 @@
   opacity: 1;
 }
 
-.video-list-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  /* Other styles */
-}
-  
-.progress-bar {
-  width: 100%;
-  height: 20px;
-  background-color: #eee;
-  border-radius: 4px;
-}
-  
-.progress-bar-fill {
-  height: 100%;
+.progress-dashboard > button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
   background-color: #3498db;
-  border-radius: 4px;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.progress-dashboard > button:hover {
+  background-color: #2980b9;
 }
 
 .progress-btn {

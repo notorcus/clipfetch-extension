@@ -1,6 +1,6 @@
 // ProgressButton.tsx
 import React from 'react';
-import './dashboardStyles.css';
+import './DashboardStyles.css';
 
 interface ProgressButtonProps {
   onClick: () => void;

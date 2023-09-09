@@ -1,7 +1,7 @@
 // ProgressDashboard.tsx
 import React, { useState, useEffect } from 'react';
-import VideoListItem from './FileDownloadCard';
-import './dashboardStyles.css';
+import DownloadCard from './DownloadCard';
+import './DashboardStyles.css';
 
 interface Video {
   title: string;
@@ -16,15 +16,24 @@ interface ProgressDashboardProps {
 const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ isOpen }) => {
   const [videos, setVideos] = useState<Video[]>([]);
 
-  useEffect(() => {
-    console.log(`ProgressDashboard received command to: ${isOpen ? "Open" : "Close"}`);
-  }, [isOpen]);
+  const addDummyVideo = () => {
+    const dummyVideo: Video = {
+      title: `Dummy Video ${videos.length + 1}`,
+      progress: Math.floor(Math.random() * 101), // Random progress between 0 and 100
+      status: 'downloading'
+    };
+
+    setVideos(prevVideos => [...prevVideos, dummyVideo]);
+  };
 
   return (
     <div className={`progress-dashboard ${isOpen ? "visible" : "hidden"}`}>
-      Progress Dashboard
+      <button onClick={addDummyVideo}>Add Dummy Video</button>
+      {videos.map(video => (
+        <DownloadCard key={video.title} video={video} />
+      ))}
     </div>
-  );  
+  );
 }
 
 export default ProgressDashboard;
