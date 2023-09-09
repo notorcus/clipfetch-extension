@@ -117,7 +117,7 @@ const downloadStream = (
 
     let totalFragments = 0; // Stores the total number of fragments
     let lastLoggedFragment = -1; // Stores the last logged fragment to avoid duplicate logs
-  
+    
     ytDlpDownload.stdout.on('data', (data) => {
       const output = data.toString();
   
@@ -132,6 +132,11 @@ const downloadStream = (
       if (fragmentMatch) {
         const currentFragment = parseInt(fragmentMatch[1], 10);
         
+        // If current fragment is the last fragment, skip logging and callback
+        if (currentFragment === totalFragments) {
+          return;
+        }
+  
         // Calculate the percentage
         const percentage = (currentFragment / totalFragments) * 100;
   
@@ -139,6 +144,11 @@ const downloadStream = (
         if (currentFragment !== lastLoggedFragment) {
           console.log(`Progress: ${percentage.toFixed(2)}% (Fragment ${currentFragment} of ${totalFragments})`);
           lastLoggedFragment = currentFragment;
+  
+          // Passing the percentage to the callback
+          if (onProgress) {
+            onProgress(percentage);
+          }
         }
       }
     });
