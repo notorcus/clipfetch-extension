@@ -3,6 +3,7 @@
   width: 100vw;
   box-sizing: border-box;
   height: 200px;
+  overflow-y: auto;
   
   /* Positioning */
   position: fixed;
@@ -23,6 +24,20 @@
   
   /* Transition for smooth appearance */
   transition: opacity 50ms, visibility ms;
+}
+
+/* Scrollbar */
+.progress-dashboard::-webkit-scrollbar {
+  width: 5px;
+}
+
+.progress-dashboard::-webkit-scrollbar-thumb {
+  background-color: #88888888;
+  border-radius: 10px;
+}
+
+.progress-dashboard::-webkit-scrollbar-thumb:hover {
+  background-color: #888;
 }
 
 .progress-dashboard.hidden {
