@@ -12,13 +12,16 @@ export const downloadYT = async (
     console.log("Input field is empty.");
     return;
   }
-  // console.log("Download button clicked. Input value:", inputValue);
   console.log("Initiating download...");
 
   try {
     const [videoTitle, videoFileData, audioFileData] = await Promise.all([
       getVideoTitle(inputValue),
-      downloadStream(inputValue, videoFormatId, outputPath, null, onProgress),
+      downloadStream(inputValue, videoFormatId, outputPath, null, (progress) => {
+        if (onProgress) {
+          onProgress(progress * 0.5); // 50% of total progress
+        }
+      }),
       downloadStream(inputValue, audioFormatId, outputPath)
     ]);
     
@@ -31,10 +34,14 @@ export const downloadYT = async (
       videoFileData.absFilePath,
       audioFileData.absFilePath,
       outputPath,
-      videoTitle.replace(/\//g, '')
+      videoTitle.replace(/\//g, ''),
+      (progress) => {
+        if (onProgress) {
+          onProgress(50 + progress * 0.5);
+        }
+      }
     );
     
-    // Replace all backslashes with forward slashes
     console.log("Merged file path:", mergedFilePath);
 
     // Delete the temporary video and audio files
