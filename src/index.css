@@ -7,3 +7,8 @@ body, button, input, textarea {
 .main-container {
     width: 100%;
 }
+
+.download-progress-container {
+    display: flex;
+    flex-direction: column;
+}
