@@ -1,6 +1,26 @@
 .progress-dashboard {
-  /* ... existing styles ... */
-  transition: opacity 0.3s, visibility 0.3s;
+  /* Dimensions */
+  width: 100vw; /* full viewport width */
+  height: 200px;
+  
+  /* Positioning */
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  
+  /* Design */
+  background-color: #1E1E1E;
+  color: #bbbbbb;
+  border: 2px solid 1C1C1C;
+  
+  /* Centering the text */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  /* Transition for smooth appearance */
+  transition: opacity 50ms, visibility ms;
 }
 
 .progress-dashboard.hidden {

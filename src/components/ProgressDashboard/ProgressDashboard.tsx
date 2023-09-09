@@ -22,9 +22,7 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ isOpen }) => {
 
   return (
     <div className={`progress-dashboard ${isOpen ? "visible" : "hidden"}`}>
-      {videos.map(video => (
-        <VideoListItem key={video.title} video={video} />
-      ))}
+      Progress Dashboard
     </div>
   );  
 }
