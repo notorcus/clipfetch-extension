@@ -261,24 +261,6 @@ const mergeStreams = (
   });
 };
 
-const getTotalFrames = (videoFile: string, audioFile: string, videoCodec: string): Promise<number> => {
-  return new Promise((resolve, reject) => {
-    // Prepare the ffprobe command
-    const cmd = `ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=nokey=1:noprint_wrappers=1 -i "${videoFile}"`;
-
-    exec(cmd, (error, stdout, stderr) => {
-      if (error) {
-        reject(error);
-      } else {
-        // Parse the number of frames from the output
-        const totalFrames = parseInt(stdout.trim(), 10);
-        resolve(totalFrames);
-      }
-    });
-  });
-};
-
-
  function deleteFile(filePath: string) {
   csInterface.evalScript(`$.runScript.deleteFile("${filePath.replace(/\\/g, '/')}")`, function(result: string) {
       if (result === 'true') {
