@@ -9,6 +9,7 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
     filename: 'bundle.js'
   },
+  devtool: "source-map",
   externals: {
     'child_process': 'commonjs child_process',
   },
