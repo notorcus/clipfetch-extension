@@ -12,20 +12,19 @@ function App() {
   const [showDashboard, setShowDashboard] = useState(false);
   const [videos, setVideos] = useState<Video[]>([]);
 
-  const handleProgressUpdate = (title: string, progress: number) => {
-    setVideos(prevVideos => prevVideos.map(video => video.title === title ? { ...video, progress } : video));
+  const handleProgressUpdate = (id: number, progress: number) => {
+    setVideos(prevVideos => prevVideos.map(video => video.id === id ? { ...video, progress } : video));
   };
 
-  const handleNewVideoDownload = (title: string) => {
+  const handleNewVideoDownload = (id: number, title: string) => {
     const newVideo: Video = {
-      id: Date.now(),
+      id,
       title,
       progress: 0,
       status: 'downloading'
     };
-  
     setVideos(prevVideos => [...prevVideos, newVideo]);
-  }  
+  };  
 
   return (
     <DownloadSettingsProvider>

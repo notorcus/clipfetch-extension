@@ -14,35 +14,41 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ isOpen, incomingV
 
   useEffect(() => {
     const updatedVideos: Video[] = incomingVideos.map(incomingVideo => {
-      const existingVideo = videos.find(video => video.title === incomingVideo.title);
+      const existingVideo = videos.find(video => video.id === incomingVideo.id); // changed from title to id
   
       if (existingVideo) {
-
         if (incomingVideo.progress >= 100) {
           return { ...existingVideo, progress: 100, status: 'completed' as const };
         }
-
-        return { ...existingVideo, ...incomingVideo };
+  
+        return { 
+          ...existingVideo, 
+          progress: incomingVideo.progress, 
+          // add any other fields from incomingVideo that you want to update
+        };
       }
-
+  
       if (incomingVideo.progress >= 100) {
         return { ...incomingVideo, status: 'completed' as const };
       }
-
+  
       return incomingVideo;
     });
   
     setVideos(updatedVideos);
-  }, [incomingVideos]);
+  }, [incomingVideos]);  
   
 
-  const handleStatusChange = (videoTitle: string, newStatus: 'downloading' | 'completed' | 'failed' | 'cancelled' | 'removed') => {
+  const handleStatusChange = (videoId: number, newStatus: 'downloading' | 'completed' | 'failed' | 'cancelled' | 'removed') => {
+    console.log(`handleStatusChange called with id: ${videoId} and status: ${newStatus}`);
+    
     if (newStatus === 'removed') {
-      setVideos(prevVideos => prevVideos.filter(video => video.title !== videoTitle));
+      console.log(`Request to remove video with id: ${videoId}`);
+      // Do not remove the video, just log the request
     } else {
       setVideos(prevVideos => {
         return prevVideos.map(video => {
-          if (video.title === videoTitle) {
+          if (video.id === videoId) {
             return { ...video, status: newStatus };
           }
           return video;
@@ -50,18 +56,19 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ isOpen, incomingV
       });
     }
   }
-
+  
   return (
     <div className={`progress-dashboard ${isOpen ? "visible" : "hidden"}`}>
       {videos.map(video => (
         <DownloadCard 
-          key={video.title} 
+          key={video.id}
           video={video} 
-          onStatusChange={(newStatus) => handleStatusChange(video.title, newStatus)} 
+          onStatusChange={(videoId, newStatus) => handleStatusChange(videoId, newStatus)}
         />
       ))}
     </div>
-  );
+  );  
 }
+
 
 export default ProgressDashboard;

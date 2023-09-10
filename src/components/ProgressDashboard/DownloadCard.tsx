@@ -1,35 +1,39 @@
 // DownloadCard.tsx
-import React from 'react';
+import React, { useCallback } from 'react';
 import ProgressBar from './ProgressBar';
 import './DownloadCard.css';
 import DownloadStateIcon from './DownloadStateIcon';
 
 interface DownloadCardProps {
   video: {
+    id: number;
     title: string;
     progress: number;
     status: 'downloading' | 'completed' | 'failed' | 'cancelled' | 'removed';
   };
-  onStatusChange: (status: 'downloading' | 'completed' | 'failed' | 'cancelled' | 'removed') => void;
+  onStatusChange: (videoId: number, status: 'downloading' | 'completed' | 'failed' | 'cancelled' | 'removed') => void;
 }
 
 const DownloadCard: React.FC<DownloadCardProps> = ({ video, onStatusChange }) => {
 
-  const handleCancel = () => {
-    console.log(`Cancelling download for ${video.title}`);
-    onStatusChange('cancelled');
-  };
-
-  const handleRemove = () => {
-    console.log(`Removing download card for ${video.title}`);
-    onStatusChange('removed');
-  };
+  const handleCancel = useCallback(() => {
+    onStatusChange(video.id, 'cancelled');
+  }, [video.title, video.id, onStatusChange]);
+  
+  const handleRemove = useCallback(() => {
+    onStatusChange(video.id, 'removed');
+  }, [video.title, video.id, onStatusChange]);  
 
   return (
     <div className="download-card">
       <span className="download-title">{video.title}</span>
       <ProgressBar progress={video.progress} />
-      <DownloadStateIcon state={video.status} onCancel={handleCancel} onRemove={handleRemove} />
+      <DownloadStateIcon 
+        id={video.id} 
+        state={video.status} 
+        onCancel={handleCancel}
+        onRemove={handleRemove}
+      />
     </div>
   );
 }

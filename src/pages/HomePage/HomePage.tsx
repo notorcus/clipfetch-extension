@@ -4,15 +4,12 @@ import LinkInput from './components/LinkInput';
 import DownloadButton from './components/DownloadButton';
 import QualityDropdown from './components/QualityDropdown';
 import { getAvailableFormats } from '../../../backend/DownloadManager/DownloadUtils';
-import { Video } from '../../../types/videoTypes';
 import './HomePage.css';
 
-
-interface HomePageProps {
-  onVideosChange: (videos: Video[]) => void;
-}
-
-const HomePage: React.FC<{onProgressUpdate: (title: string, progress: number) => void, onNewVideoDownload: (title: string) => void}> = ({ onProgressUpdate, onNewVideoDownload }) => {
+const HomePage: React.FC<{
+  onProgressUpdate: (id: number, progress: number) => void,
+  onNewVideoDownload: (id: number, title: string) => void
+}> = ({ onProgressUpdate, onNewVideoDownload }) => {
   const [inputValue, setInputValue] = useState('');  
   const [videoOptions, setVideoOptions] = useState<{ [resolution: string]: string }>({});
   const [audioOptions, setAudioOptions] = useState<{ [friendlyName: string]: string }>({});

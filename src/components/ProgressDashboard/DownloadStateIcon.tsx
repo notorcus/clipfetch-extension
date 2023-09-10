@@ -1,22 +1,23 @@
 // DownloadStateIcon.tsx
-import React from 'react';
+import React, { useCallback } from 'react';
 import './DownloadStateIcon.css';
 
 interface DownloadStateIconProps {
+  id: number;
   state: 'downloading' | 'completed' | 'failed' | 'cancelled' | 'removed';
-  onCancel: () => void;
-  onRemove?: () => void;
+  onCancel: (id: number) => void;
+  onRemove?: (id: number) => void;
 }
 
-const DownloadStateIcon: React.FC<DownloadStateIconProps> = ({ state, onCancel, onRemove }) => {
-  const handleIconClick = () => {
+const DownloadStateIcon: React.FC<DownloadStateIconProps> = ({ id, state, onCancel, onRemove }) => {
+  const handleIconClick = useCallback(() => {
     if (state === 'downloading' && onCancel) {
-      onCancel();
+      onCancel(id);
     }
     if (state === 'completed' && onRemove) {
-      onRemove();
+      onRemove(id);
     }
-  };
+  }, [id, state, onCancel, onRemove]);
 
   return (
     <div 

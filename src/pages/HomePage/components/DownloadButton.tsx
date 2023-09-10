@@ -10,8 +10,8 @@ interface DownloadButtonProps {
   videoFormatId: string;
   audioFormatId: string;
   platform: string | null;
-  onProgressUpdate: (title: string, progress: number) => void;
-  onNewVideoDownload: (title: string) => void;
+  onProgressUpdate: (id: number, progress: number) => void;
+  onNewVideoDownload: (id: number, title: string) => void;
 }
 
 const DownloadButton: React.FC<DownloadButtonProps> = ({
@@ -27,16 +27,16 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
       console.log("Input field is empty.");
       return;
     }
-
+    
     try {
       if (platform?.toLowerCase() === 'youtube') {
         const videoTitle = await getVideoTitle(inputValue);
-        console.log("Video Format ID:", videoFormatId);
-        // console.log("Audio Format ID:", audioFormatId);
-        onNewVideoDownload(videoTitle);
+        const videoId = Date.now();
+
+        onNewVideoDownload(videoId, videoTitle);
 
         await downloadYT(inputValue, videoFormatId, audioFormatId, outputPath, (progress) => {
-          onProgressUpdate(videoTitle, progress);
+          onProgressUpdate(videoId, progress);
         });
       } else if (platform?.toLowerCase() === 'googledrive') {
         await downloadDrive(inputValue, videoFormatId, outputPath);
