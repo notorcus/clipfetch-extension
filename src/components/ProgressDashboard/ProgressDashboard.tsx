@@ -18,19 +18,28 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ isOpen, incomingV
   const [videos, setVideos] = useState<Video[]>([]); 
 
   useEffect(() => {
-    setVideos(prevVideos => {
-      return incomingVideos .map(externalVideo => {
-        const matchingVideo = prevVideos.find(video => video.title === externalVideo.title);
-        
-        if (externalVideo.progress >= 100) {
-          return { ...externalVideo, status: 'completed' };
-        } else if (matchingVideo) {
-          return { ...matchingVideo, ...externalVideo }; // Merge with previous video data
+    const updatedVideos: Video[] = incomingVideos.map(incomingVideo => {
+      const existingVideo = videos.find(video => video.title === incomingVideo.title);
+  
+      if (existingVideo) {
+
+        if (incomingVideo.progress >= 100) {
+          return { ...existingVideo, progress: 100, status: 'completed' as const };
         }
-        return externalVideo;
-      });
+
+        return { ...existingVideo, ...incomingVideo };
+      }
+
+      if (incomingVideo.progress >= 100) {
+        return { ...incomingVideo, status: 'completed' as const };
+      }
+
+      return incomingVideo;
     });
-  }, [incomingVideos ]);  
+  
+    setVideos(updatedVideos);
+  }, [incomingVideos]);
+  
 
   const handleStatusChange = (videoTitle: string, newStatus: 'downloading' | 'completed' | 'failed' | 'cancelled' | 'removed') => {
     if (newStatus === 'removed') {
