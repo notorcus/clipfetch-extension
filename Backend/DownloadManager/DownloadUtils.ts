@@ -295,5 +295,33 @@ const getVideoTitle = (url: string): Promise<string> => {
   });
 };
 
+const videoExists = (absoluteFilePath: string): boolean => {
+  const stat = window.cep.fs.stat(absoluteFilePath);
+  return stat.err === 0;
+};
 
-export { getAvailableFormats, downloadStream, mergeStreams, deleteFile, importFile, getVideoTitle }
+
+function sanitizeFilename(filename: string): string {
+  const disallowedChars = /[\/:*?"<>|]/g; 
+  return filename.replace(disallowedChars, '_');  // Replace disallowed characters with underscores
+}
+
+const findAvailableFilename = (outputPath: string, baseFilename: string, extension: string = '.mp4'): string => {
+  let counter = 1;
+  let newFilename = `${baseFilename}${extension}`;
+  let fullOutputPath = `${outputPath}/${newFilename}`;
+  
+  
+  while (videoExists(fullOutputPath)) {
+    console.log("File path:", fullOutputPath);
+    newFilename = `${baseFilename}_${counter}${extension}`;
+    fullOutputPath = `${outputPath}/${newFilename}`;
+    console.log("Checking File Path:", fullOutputPath);
+    counter++;
+  }
+  
+  console.log("Available Filename:", newFilename);
+  return newFilename;
+};
+
+export { getAvailableFormats, downloadStream, mergeStreams, deleteFile, importFile, getVideoTitle, videoExists, sanitizeFilename, findAvailableFilename }

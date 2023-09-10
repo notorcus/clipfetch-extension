@@ -1,5 +1,5 @@
 // Main.ts
-import { downloadStream, mergeStreams, deleteFile, importFile, getVideoTitle } from "./DownloadUtils";
+import { downloadStream, mergeStreams, deleteFile, importFile, getVideoTitle, videoExists, sanitizeFilename, findAvailableFilename } from "./DownloadUtils";
 
 export const downloadYT = async (
   inputValue: string,
@@ -14,6 +14,8 @@ export const downloadYT = async (
   }
   console.log("Initiating download...");
 
+  let shouldOverwrite = true;  // Default overwrite decision to true
+
   try {
     const [videoTitle, videoFileData, audioFileData] = await Promise.all([
       getVideoTitle(inputValue),
@@ -24,17 +26,33 @@ export const downloadYT = async (
       }),
       downloadStream(inputValue, audioFormatId, outputPath)
     ]);
-    
+
     console.log("Video path:", videoFileData.absFilePath);
     console.log("Audio path:", audioFileData.absFilePath);
-    console.log("Video Title:", videoTitle)
+    console.log("Video Title:", videoTitle);
 
-    const sanitizedTitle = sanitizeFilename(videoTitle);
+    let mergedFilename = sanitizeFilename(videoTitle);
+
+    shouldOverwrite = await new Promise((resolve) => {
+      if (videoExists(`${outputPath}/${mergedFilename}.mp4`)) {
+        const overwrite = window.confirm("A video with the same title already exists!\nDo you want to overwrite the existing video?");
+        console.log("Overwrite?:", overwrite)
+        resolve(overwrite);
+      } else {
+        resolve(true);
+      }
+    });
+
+    if (!shouldOverwrite) {
+      console.log("mergedFilename:", mergedFilename);
+      mergedFilename = findAvailableFilename(outputPath, mergedFilename);
+    }
+
     const mergedFilePath = await mergeStreams(
       videoFileData.absFilePath,
       audioFileData.absFilePath,
       outputPath,
-      sanitizedTitle,
+      mergedFilename.replace('.mp4', ''),
       (progress) => {
         if (onProgress) {
           onProgress(50 + progress * 0.5);
@@ -48,6 +66,7 @@ export const downloadYT = async (
     importFile(mergedFilePath);
     deleteFile(videoFileData.absFilePath);
     deleteFile(audioFileData.absFilePath);
+
   } catch (error) {
     console.log("Error:", error);
   }
@@ -82,8 +101,3 @@ export const downloadDrive = async (inputValue: string, videoFormatId: string, o
     console.log("Error:", error);
   }
 };
-
-function sanitizeFilename(filename: string): string {
-  const disallowedChars = /[\/:*?"<>|]/g; 
-  return filename.replace(disallowedChars, '_');  // Replace disallowed characters with underscores
-}
