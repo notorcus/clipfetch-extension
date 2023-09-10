@@ -29,12 +29,12 @@ export const downloadYT = async (
     console.log("Audio path:", audioFileData.absFilePath);
     console.log("Video Title:", videoTitle)
 
-    // Merge the video and audio streams
+    const sanitizedTitle = sanitizeFilename(videoTitle);
     const mergedFilePath = await mergeStreams(
       videoFileData.absFilePath,
       audioFileData.absFilePath,
       outputPath,
-      videoTitle.replace(/\//g, ''),
+      sanitizedTitle,
       (progress) => {
         if (onProgress) {
           onProgress(50 + progress * 0.5);
@@ -82,3 +82,8 @@ export const downloadDrive = async (inputValue: string, videoFormatId: string, o
     console.log("Error:", error);
   }
 };
+
+function sanitizeFilename(filename: string): string {
+  const disallowedChars = /[\/:*?"<>|]/g; 
+  return filename.replace(disallowedChars, '_');  // Replace disallowed characters with underscores
+}
