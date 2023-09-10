@@ -4,13 +4,10 @@ import LinkInput from './components/LinkInput';
 import DownloadButton from './components/DownloadButton';
 import QualityDropdown from './components/QualityDropdown';
 import { getAvailableFormats } from '../../../backend/DownloadManager/DownloadUtils';
+import { Video } from '../../../types/videoTypes';
 import './HomePage.css';
 
-interface Video {
-  title: string;
-  progress: number;
-  status: 'downloading' | 'completed' | 'failed';
-}
+
 interface HomePageProps {
   onVideosChange: (videos: Video[]) => void;
 }

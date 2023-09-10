@@ -2,12 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import DownloadCard from './DownloadCard';
 import './DashboardStyles.css';
-
-interface Video {
-  title: string;
-  progress: number;
-  status: 'downloading' | 'completed' | 'failed'| 'cancelled';
-}
+import { Video } from '../../../types/videoTypes'
 
 interface ProgressDashboardProps {
   isOpen: boolean;

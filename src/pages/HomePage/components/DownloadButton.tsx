@@ -31,7 +31,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
     try {
       if (platform?.toLowerCase() === 'youtube') {
         const videoTitle = await getVideoTitle(inputValue);
-        // console.log("Video Format ID:", videoFormatId);
+        console.log("Video Format ID:", videoFormatId);
         // console.log("Audio Format ID:", audioFormatId);
         onNewVideoDownload(videoTitle);
 

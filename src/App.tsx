@@ -5,12 +5,8 @@ import HomePage from './pages/HomePage/HomePage';
 import ProgressButton from './components/ProgressDashboard/ProgressButton';
 import ProgressDashboard from './components/ProgressDashboard/ProgressDashboard';
 import { DownloadSettingsProvider } from './DownloadSettingsContext';
+import { Video } from '../types/videoTypes';
 
-interface Video {
-  title: string;
-  progress: number;
-  status: 'downloading' | 'completed' | 'failed';
-}
 
 function App() {
   const [showDashboard, setShowDashboard] = useState(false);
@@ -21,8 +17,15 @@ function App() {
   };
 
   const handleNewVideoDownload = (title: string) => {
-    setVideos(prevVideos => [...prevVideos, { title, progress: 0, status: 'downloading' }]);
-  };
+    const newVideo: Video = {
+      id: Date.now(),
+      title,
+      progress: 0,
+      status: 'downloading'
+    };
+  
+    setVideos(prevVideos => [...prevVideos, newVideo]);
+  }  
 
   return (
     <DownloadSettingsProvider>
