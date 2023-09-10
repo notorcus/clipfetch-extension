@@ -31,7 +31,8 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
     try {
       if (platform?.toLowerCase() === 'youtube') {
         const videoTitle = await getVideoTitle(inputValue);
-        console.log(`Sending new download request for video: ${videoTitle}`);
+        // console.log("Video Format ID:", videoFormatId);
+        // console.log("Audio Format ID:", audioFormatId);
         onNewVideoDownload(videoTitle);
 
         await downloadYT(inputValue, videoFormatId, audioFormatId, outputPath, (progress) => {

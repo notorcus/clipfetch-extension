@@ -72,13 +72,11 @@ const HomePage: React.FC<{onProgressUpdate: (title: string, progress: number) =>
       
           // Set the default selected formats to the highest quality options using the fetched formats directly
           const firstVideoOptionKey = Object.keys(bestFormatsByResolution)[0];
-          setSelectedVideoFormat(bestFormatsByResolution[firstVideoOptionKey]);
-          console.log('Default Video Format ID:', bestFormatsByResolution[firstVideoOptionKey]);
+          setSelectedVideoFormat(firstVideoOptionKey);
 
           if (currentIsYouTube) {
               const firstAudioOptionKey = Object.keys(bestAudioFormats)[0];
-              setSelectedAudioFormat(bestAudioFormats[firstAudioOptionKey]);
-              console.log('Default Audio Format ID:', bestAudioFormats[firstAudioOptionKey]);
+              setSelectedAudioFormat(firstAudioOptionKey);
           }
         }
       });
@@ -105,14 +103,16 @@ const HomePage: React.FC<{onProgressUpdate: (title: string, progress: number) =>
               <QualityDropdown 
                 options={Object.keys(videoOptions)} 
                 label={isYouTube ? "Video Quality" : "Resolution"} 
-                onSelect={(selected) => setSelectedVideoFormat(videoOptions[selected])} 
+                selected={selectedVideoFormat}
+                onSelect={(selected) => setSelectedVideoFormat(selected)} 
               />
             )}
             {isYouTube && Object.keys(audioOptions).length > 0 && (
               <QualityDropdown 
                 options={Object.keys(audioOptions)} 
                 label="Audio Quality" 
-                onSelect={(selected) => setSelectedAudioFormat(audioOptions[selected])} 
+                selected={selectedAudioFormat}
+                onSelect={(selected) => setSelectedAudioFormat(selected)} 
               />
             )}
           </div>
@@ -120,8 +120,8 @@ const HomePage: React.FC<{onProgressUpdate: (title: string, progress: number) =>
             <div className="download-button-container">
               <DownloadButton 
                 inputValue={inputValue} 
-                videoFormatId={selectedVideoFormat} 
-                audioFormatId={selectedAudioFormat} 
+                videoFormatId={videoOptions[selectedVideoFormat]} 
+                audioFormatId={audioOptions[selectedAudioFormat]} 
                 platform={platform}
                 onProgressUpdate={onProgressUpdate}
                 onNewVideoDownload={onNewVideoDownload}
@@ -132,8 +132,8 @@ const HomePage: React.FC<{onProgressUpdate: (title: string, progress: number) =>
             <div className="download-button-container">
               <DownloadButton 
                 inputValue={inputValue} 
-                videoFormatId={selectedVideoFormat} 
-                audioFormatId={selectedAudioFormat} 
+                videoFormatId={videoOptions[selectedVideoFormat]} 
+                audioFormatId={audioOptions[selectedAudioFormat]} 
                 platform={platform}
                 onProgressUpdate={onProgressUpdate}
                 onNewVideoDownload={onNewVideoDownload}
