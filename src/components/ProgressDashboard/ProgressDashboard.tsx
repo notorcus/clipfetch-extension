@@ -11,15 +11,15 @@ interface Video {
 
 interface ProgressDashboardProps {
   isOpen: boolean;
-  externalVideos: Video[];
+  incomingVideos : Video[];
 }
 
-const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ isOpen, externalVideos }) => {
+const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ isOpen, incomingVideos  }) => {
   const [videos, setVideos] = useState<Video[]>([]); 
 
   useEffect(() => {
     setVideos(prevVideos => {
-      return externalVideos.map(externalVideo => {
+      return incomingVideos .map(externalVideo => {
         const matchingVideo = prevVideos.find(video => video.title === externalVideo.title);
         
         if (externalVideo.progress >= 100) {
@@ -30,7 +30,7 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ isOpen, externalV
         return externalVideo;
       });
     });
-  }, [externalVideos]);  
+  }, [incomingVideos ]);  
 
   const handleStatusChange = (videoTitle: string, newStatus: 'downloading' | 'completed' | 'failed' | 'cancelled' | 'removed') => {
     if (newStatus === 'removed') {

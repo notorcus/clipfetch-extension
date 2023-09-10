@@ -28,19 +28,15 @@ function App() {
     <DownloadSettingsProvider>
       <div className="main-container">
         <HomePage 
-          onProgressUpdate={(title, progress) => {
-            handleProgressUpdate(title, progress);
-          }}
-          onNewVideoDownload={(title) => {
-            handleNewVideoDownload(title);
-          }}
+          onProgressUpdate={handleProgressUpdate}
+          onNewVideoDownload={handleNewVideoDownload}
         />
         <div className="download-progress-container">
           <ProgressButton 
             onClick={() => setShowDashboard(prevState => !prevState)} 
             showDashboard={showDashboard}
           />
-          <ProgressDashboard isOpen={showDashboard} externalVideos={videos} />
+          <ProgressDashboard isOpen={showDashboard} incomingVideos={videos} />
         </div>
       </div>
     </DownloadSettingsProvider>
