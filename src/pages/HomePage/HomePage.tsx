@@ -27,28 +27,6 @@ const HomePage: React.FC<{onProgressUpdate: (title: string, progress: number) =>
   const [platform, setPlatform] = useState<string | null>(null);
   const isYouTube = platform?.trim().toLowerCase() === 'youtube';
   const isDrive = platform?.trim().toLowerCase() === 'googledrive';
-  const [videos, setVideos] = useState<Video[]>([]);
-
-  const handleProgressUpdate = (title: string, progress: number) => {
-    const updatedVideos = videos.map(video => {
-      if (video.title === title) {
-        return { ...video, progress };
-      }
-      return video;
-    });
-
-    setVideos(updatedVideos);
-  };
-
-  const handleNewVideoDownload = (title: string) => {
-    const newVideo: Video = {
-      title,
-      progress: 0,
-      status: 'downloading'
-    };
-
-    setVideos(prevVideos => [...prevVideos, newVideo]);
-  };
   
   useEffect(() => {
     if (inputValue) {
@@ -82,8 +60,6 @@ const HomePage: React.FC<{onProgressUpdate: (title: string, progress: number) =>
       });
     }
   }, [inputValue]);
-
-  
 
   const handleInputChange = (newValue: string) => {
     setInputValue(newValue);
