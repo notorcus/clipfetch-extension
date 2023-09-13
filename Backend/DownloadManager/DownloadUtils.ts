@@ -182,9 +182,8 @@ export const downloadDriveStream = (
 ): Promise<{absFilePath: string, fileName: string}> => {
   return new Promise((resolve, reject) => {
     let stderrData = '';
-    let stdoutData = '';
 
-    const fileName = `${videoTitle}.%(ext)s`;
+    const fileName = `${videoTitle}`;
     const filePath = `${outputPath}/${fileName}`;
 
     const ytDlpDownload = spawn('yt-dlp', ['-f', formatId, url, '-o', filePath, "--newline", '--progress-template', '"%(progress._default_template)s"']);
@@ -206,21 +205,9 @@ export const downloadDriveStream = (
       }
     });
     
-    ytDlpDownload.on('close', async (code) => {
+    ytDlpDownload.on('close', (code) => {
       if (code === 0) {
-        const ytDlpFilename = spawn('yt-dlp', ['--get-filename', '-f', formatId, url, '-o', filePath]);
-        
-        ytDlpFilename.stdout.on('data', (data) => {
-          stdoutData += data;
-        });
-
-        ytDlpFilename.on('close', (code) => {
-          if (code === 0) {
-            resolve({ absFilePath: stdoutData.trim(), fileName });
-          } else {
-            reject(`yt-dlp process for filename exited with code ${code}`);
-          }
-        });
+        resolve({ absFilePath: filePath, fileName });
       } else {
         console.error(`Full stderr: ${stderrData}`);
         reject(`yt-dlp process exited with code ${code}`);
@@ -228,6 +215,7 @@ export const downloadDriveStream = (
     });
   });
 };
+
 
 function generateRandomString(length: number): string {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

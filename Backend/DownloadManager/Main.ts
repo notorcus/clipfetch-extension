@@ -83,23 +83,20 @@ export const downloadDrive = async (inputValue: string, videoFormatId: string, o
     const videoTitle = await getVideoTitle(inputValue);
     
     // Remove the extension from the video title
-    const lastDotIndex = videoTitle.lastIndexOf('.');
-    const titleWithoutExtension = (lastDotIndex !== -1) ? videoTitle.substring(0, lastDotIndex) : videoTitle;
-    
-    console.log("Drive file Title:", titleWithoutExtension);
+    console.log("Drive file Title:", videoTitle);
   
     // Then download the video stream using the title without extension
     const videoFileData = await downloadDriveStream(
       inputValue, 
       videoFormatId, 
       outputPath, 
-      titleWithoutExtension,
+      videoTitle,
       (progress) => {  // This is the onProgress callback
         console.log(`Download progress: ${progress}%`);
       }
     );
   
-    // console.log("Video path:", videoFileData.absFilePath);
+    console.log("Video path:", videoFileData.absFilePath);
     importFile(videoFileData.absFilePath);
   } catch (error) {
     console.log("Error:", error);
