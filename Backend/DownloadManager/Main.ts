@@ -1,5 +1,5 @@
 // Main.ts
-import { downloadStream, mergeStreams, deleteFile, importFile, getVideoTitle, videoExists, sanitizeFilename, findAvailableFilename } from "./DownloadUtils";
+import { downloadYTStream, mergeStreams, deleteFile, importFile, getVideoTitle, videoExists, sanitizeFilename, findAvailableFilename, downloadDriveStream } from "./DownloadUtils";
 
 export const downloadYT = async (
   inputValue: string,
@@ -19,12 +19,12 @@ export const downloadYT = async (
   try {
     const [videoTitle, videoFileData, audioFileData] = await Promise.all([
       getVideoTitle(inputValue),
-      downloadStream(inputValue, videoFormatId, outputPath, null, (progress) => {
+      downloadYTStream(inputValue, videoFormatId, outputPath, (progress) => {
         if (onProgress) {
           onProgress(progress * 0.5); // 50% of total progress
         }
       }),
-      downloadStream(inputValue, audioFormatId, outputPath)
+      downloadYTStream(inputValue, audioFormatId, outputPath)
     ]);
 
     console.log("Video path:", videoFileData.absFilePath);
@@ -36,7 +36,6 @@ export const downloadYT = async (
     shouldOverwrite = await new Promise((resolve) => {
       if (videoExists(`${outputPath}/${mergedFilename}.mp4`)) {
         const overwrite = window.confirm("A video with the same title already exists!\nDo you want to overwrite the existing video?");
-        console.log("Overwrite?:", overwrite)
         resolve(overwrite);
       } else {
         resolve(true);
@@ -81,21 +80,26 @@ export const downloadDrive = async (inputValue: string, videoFormatId: string, o
   console.log("Initiating download from drive...");
 
   try {
-    // Get the video title first
     const videoTitle = await getVideoTitle(inputValue);
     
     // Remove the extension from the video title
     const lastDotIndex = videoTitle.lastIndexOf('.');
     const titleWithoutExtension = (lastDotIndex !== -1) ? videoTitle.substring(0, lastDotIndex) : videoTitle;
     
-    console.log("Video Title:", titleWithoutExtension);
+    console.log("Drive file Title:", titleWithoutExtension);
   
     // Then download the video stream using the title without extension
-    const videoFileData = await downloadStream(inputValue, videoFormatId, outputPath, titleWithoutExtension);
+    const videoFileData = await downloadDriveStream(
+      inputValue, 
+      videoFormatId, 
+      outputPath, 
+      titleWithoutExtension,
+      (progress) => {  // This is the onProgress callback
+        console.log(`Download progress: ${progress}%`);
+      }
+    );
   
-    console.log("Video path:", videoFileData.absFilePath);
-    
-    // Delete the temporary video and audio files
+    // console.log("Video path:", videoFileData.absFilePath);
     importFile(videoFileData.absFilePath);
   } catch (error) {
     console.log("Error:", error);

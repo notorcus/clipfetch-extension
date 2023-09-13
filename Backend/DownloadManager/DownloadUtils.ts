@@ -3,7 +3,7 @@ import { exec, spawn } from 'child_process';
 
 const csInterface = new CSInterface();
 
-const getAvailableFormats = (url: string, callback: (error: any, videoData?: any, audioData?: any, videoTitle?: string, platform?: string) => void) => {
+export const getAvailableFormats = (url: string, callback: (error: any, videoData?: any, audioData?: any, videoTitle?: string, platform?: string) => void) => {
   const ytDlp = spawn('yt-dlp', ['--dump-json', url]);
   let output = '';
   let errorOutput = '';
@@ -93,19 +93,17 @@ const getBestAudioFormats = (audioFormats: any[]) => {
   return bestAudioFormats;
 };
 
-const downloadStream = (
+export const downloadYTStream = (
   url: string, 
   formatId: string, 
   outputPath: string, 
-  videoTitle: string | null = null,
   onProgress?: (progress: number) => void
 ): Promise<{absFilePath: string, fileName: string}> => {
   return new Promise((resolve, reject) => {
     let stderrData = '';
     let stdoutData = '';
-    let downloadProgress = '';  // <-- Variable to store download progress data
 
-    const fileName = videoTitle ? `${videoTitle}.%(ext)s` : `${generateRandomString(8)}.%(ext)s`;
+    const fileName = `${generateRandomString(8)}.%(ext)s`;
     const tempFilePath = `${outputPath}/${fileName}`;
 
     const ytDlpDownload = spawn('yt-dlp', ['-f', formatId, url, '-o', tempFilePath, "--newline", '--progress-template', '"Downloading fragment: %(progress.fragment_index)s/%(progress.fragment_count)s"']);
@@ -120,6 +118,7 @@ const downloadStream = (
     
     ytDlpDownload.stdout.on('data', (data) => {
       const output = data.toString();
+      console.log("Output:", output)
   
       // Extract total fragments
       const totalFragmentsMatch = output.match(/\[hlsnative\] Total fragments: (\d+)/);
@@ -132,17 +131,15 @@ const downloadStream = (
       if (fragmentMatch) {
         const currentFragment = parseInt(fragmentMatch[1], 10);
         
-        // If current fragment is the last fragment, skip logging and callback
         if ((currentFragment - 1) === totalFragments) {
           return;
         }
   
-        // Calculate the percentage
         const percentage = (currentFragment / totalFragments) * 100;
   
         // To avoid logging the same fragment multiple times
         if (currentFragment !== lastLoggedFragment) {
-          // console.log(`Progress: ${percentage.toFixed(2)}% (Fragment ${currentFragment} of ${totalFragments})`);
+          console.log(`Progress: ${percentage.toFixed(2)}% (Fragment ${currentFragment} of ${totalFragments})`);
           lastLoggedFragment = currentFragment;
   
           // Passing the percentage to the callback
@@ -176,6 +173,62 @@ const downloadStream = (
   });
 };
 
+export const downloadDriveStream = (
+  url: string, 
+  formatId: string, 
+  outputPath: string, 
+  videoTitle: string | null = null,
+  onProgress?: (progress: number) => void
+): Promise<{absFilePath: string, fileName: string}> => {
+  return new Promise((resolve, reject) => {
+    let stderrData = '';
+    let stdoutData = '';
+
+    const fileName = `${videoTitle}.%(ext)s`;
+    const filePath = `${outputPath}/${fileName}`;
+
+    const ytDlpDownload = spawn('yt-dlp', ['-f', formatId, url, '-o', filePath, "--newline", '--progress-template', '"%(progress._default_template)s"']);
+
+    ytDlpDownload.stderr.on('data', (data) => {
+      stderrData += data;
+      console.log("yt-dlp stderr data:", data.toString());
+    });
+    
+    ytDlpDownload.stdout.on('data', (data) => {
+      const output = data.toString();
+    
+      const progressMatch = output.match(/(\d+(\.\d+)?)%/);
+      if (progressMatch && progressMatch[1]) {
+        const progressValue = parseFloat(progressMatch[1]);
+        if (onProgress) {
+          onProgress(progressValue);
+        }
+      }
+    });
+    
+    ytDlpDownload.on('close', async (code) => {
+      if (code === 0) {
+        const ytDlpFilename = spawn('yt-dlp', ['--get-filename', '-f', formatId, url, '-o', filePath]);
+        
+        ytDlpFilename.stdout.on('data', (data) => {
+          stdoutData += data;
+        });
+
+        ytDlpFilename.on('close', (code) => {
+          if (code === 0) {
+            resolve({ absFilePath: stdoutData.trim(), fileName });
+          } else {
+            reject(`yt-dlp process for filename exited with code ${code}`);
+          }
+        });
+      } else {
+        console.error(`Full stderr: ${stderrData}`);
+        reject(`yt-dlp process exited with code ${code}`);
+      }
+    });
+  });
+};
+
 function generateRandomString(length: number): string {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
@@ -185,7 +238,7 @@ function generateRandomString(length: number): string {
   return result;
 }
 
-const mergeStreams = (
+export const mergeStreams = (
   videoFile: string, 
   audioFile: string, 
   outputPath: string,
@@ -261,7 +314,7 @@ const mergeStreams = (
   });
 };
 
- function deleteFile(filePath: string) {
+export function deleteFile(filePath: string) {
   csInterface.evalScript(`$.runScript.deleteFile("${filePath.replace(/\\/g, '/')}")`, function(result: string) {
       if (result === 'true') {
           console.log("File deleted successfully");
@@ -271,12 +324,12 @@ const mergeStreams = (
   });
 }
 
-function importFile(filePath: string) {
+export function importFile(filePath: string) {
   csInterface.evalScript(`$.runScript.importFile("${filePath.replace(/\\/g, '/')}")`, function(result: string) {
   });
 }
 
-const getVideoTitle = (url: string): Promise<string> => {
+export const getVideoTitle = (url: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     let titleData = '';
     const ytDlpTitle = spawn('yt-dlp', ['--get-title', url]);
@@ -295,33 +348,28 @@ const getVideoTitle = (url: string): Promise<string> => {
   });
 };
 
-const videoExists = (absoluteFilePath: string): boolean => {
+export const videoExists = (absoluteFilePath: string): boolean => {
   const stat = window.cep.fs.stat(absoluteFilePath);
   return stat.err === 0;
 };
 
 
-function sanitizeFilename(filename: string): string {
+export function sanitizeFilename(filename: string): string {
   const disallowedChars = /[\/:*?"<>|]/g; 
   return filename.replace(disallowedChars, '_');  // Replace disallowed characters with underscores
 }
 
-const findAvailableFilename = (outputPath: string, baseFilename: string, extension: string = '.mp4'): string => {
+export const findAvailableFilename = (outputPath: string, baseFilename: string, extension: string = '.mp4'): string => {
   let counter = 1;
   let newFilename = `${baseFilename}${extension}`;
   let fullOutputPath = `${outputPath}/${newFilename}`;
   
   
   while (videoExists(fullOutputPath)) {
-    console.log("File path:", fullOutputPath);
     newFilename = `${baseFilename}_${counter}${extension}`;
     fullOutputPath = `${outputPath}/${newFilename}`;
-    console.log("Checking File Path:", fullOutputPath);
     counter++;
   }
   
-  console.log("Available Filename:", newFilename);
   return newFilename;
 };
-
-export { getAvailableFormats, downloadStream, mergeStreams, deleteFile, importFile, getVideoTitle, videoExists, sanitizeFilename, findAvailableFilename }
