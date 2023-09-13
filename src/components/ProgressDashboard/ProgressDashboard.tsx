@@ -9,42 +9,45 @@ interface ProgressDashboardProps {
   incomingVideos : Video[];
 }
 
-const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ isOpen, incomingVideos  }) => {
+const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ isOpen, incomingVideos }) => {
   const [videos, setVideos] = useState<Video[]>([]); 
+  const [removedVideoIds, setRemovedVideoIds] = useState<number[]>([]);
 
   useEffect(() => {
-    const updatedVideos: Video[] = incomingVideos.map(incomingVideo => {
-      const existingVideo = videos.find(video => video.id === incomingVideo.id); // changed from title to id
-  
-      if (existingVideo) {
-        if (incomingVideo.progress >= 100) {
-          return { ...existingVideo, progress: 100, status: 'completed' as const };
+    const updatedVideos: Video[] = incomingVideos
+      .filter(incomingVideo => incomingVideo.status !== 'removed' && !removedVideoIds.includes(incomingVideo.id))
+      .map(incomingVideo => {
+        const existingVideo = videos.find(video => video.id === incomingVideo.id);
+
+        if (existingVideo) {
+          if (incomingVideo.progress >= 100) {
+            return { ...existingVideo, progress: 100, status: 'completed' as const };
+          }
+
+          return { 
+            ...existingVideo, 
+            progress: incomingVideo.progress,
+          };
         }
-  
-        return { 
-          ...existingVideo, 
-          progress: incomingVideo.progress, 
-          // add any other fields from incomingVideo that you want to update
-        };
-      }
-  
-      if (incomingVideo.progress >= 100) {
-        return { ...incomingVideo, status: 'completed' as const };
-      }
-  
-      return incomingVideo;
-    });
-  
-    setVideos(updatedVideos);
-  }, [incomingVideos]);  
-  
+
+        if (incomingVideo.progress >= 100) {
+          return { ...incomingVideo, status: 'completed' as const };
+        }
+
+        return incomingVideo;
+      });
+
+      console.log("Updated Videos", updatedVideos)
+      setVideos(updatedVideos);
+  }, [incomingVideos, removedVideoIds]);
 
   const handleStatusChange = (videoId: number, newStatus: 'downloading' | 'completed' | 'failed' | 'cancelled' | 'removed') => {
     console.log(`handleStatusChange called with id: ${videoId} and status: ${newStatus}`);
-    
+
     if (newStatus === 'removed') {
       console.log(`Request to remove video with id: ${videoId}`);
-      // Do not remove the video, just log the request
+      setVideos(prevVideos => prevVideos.filter(video => video.id !== videoId));
+      setRemovedVideoIds(prevIds => [...prevIds, videoId]);
     } else {
       setVideos(prevVideos => {
         return prevVideos.map(video => {
