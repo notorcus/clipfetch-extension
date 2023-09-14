@@ -1,5 +1,5 @@
 // DownloadUtils.ts
-import { exec, spawn } from 'child_process';
+import { spawn } from 'child_process';
 
 const csInterface = new CSInterface();
 
@@ -23,6 +23,7 @@ export const getAvailableFormats = (url: string, callback: (error: any, videoDat
 
     try {
       const parsedData = JSON.parse(output);
+      console.log("Parsed data from yt-dlp:", parsedData);
       const videoTitle = parsedData.title || "Unknown Title";
       const platform = parsedData.extractor_key || "Unknown Platform";
       const availableFormats = parsedData.formats || [];
@@ -44,7 +45,12 @@ const groupFormatsByResolution = (formats: any[]) => {
   const formatsByResolution: { [resolution: string]: any[] } = {};
   formats.forEach((format: any) => {
     if (format.vcodec !== 'none') {
-      const resolution = format.resolution || `${format.width}x${format.height}`;
+      let resolution;
+      if (format.format_id && format.format_id.toLowerCase() === 'source') {
+        resolution = 'source';  // Explicitly set the key for source quality
+      } else {
+        resolution = format.resolution || `${format.width}x${format.height}`;
+      }
       if (!formatsByResolution[resolution]) {
         formatsByResolution[resolution] = [];
       }
@@ -62,6 +68,16 @@ const getBestVideoFormats = (formatsByResolution: { [resolution: string]: any[] 
   });
 
   const bestFormatsByResolution: { [resolution: string]: string } = {};
+
+  // Check for "source" quality and prioritize it
+  if (formatsByResolution["source"]) {
+    bestFormatsByResolution["source"] = formatsByResolution["source"][0].format_id;
+    const index = sortedResolutions.indexOf("source");
+    if (index !== -1) {
+      sortedResolutions.splice(index, 1);
+    }
+  }
+
   sortedResolutions.forEach(resolution => {
     const formats = formatsByResolution[resolution];
     formats.sort((a, b) => (b.vbr || 0) - (a.vbr || 0) || (b.fps || 0) - (a.fps || 0));

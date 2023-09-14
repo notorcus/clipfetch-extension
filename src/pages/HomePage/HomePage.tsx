@@ -39,6 +39,7 @@ const HomePage: React.FC<{
           const currentIsYouTube = platform?.trim().toLowerCase() === 'youtube';
       
           // Setting video and audio options
+          // console.log("Video Formats:", bestFormatsByResolution)
           setVideoOptions(bestFormatsByResolution);
           setAudioOptions(bestAudioFormats);
       

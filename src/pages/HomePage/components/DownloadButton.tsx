@@ -29,7 +29,6 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
     }
     
     try {
-
       const videoTitle = await getVideoTitle(inputValue);
       const videoId = Date.now();
 
@@ -43,6 +42,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
       } else if (platform?.toLowerCase() === 'googledrive') {
         
         onNewVideoDownload(videoId, videoTitle);
+        // console.log("Video format:", videoFormatId)
 
         await downloadDrive(inputValue, videoFormatId, outputPath, (progress) => {
           onProgressUpdate(videoId, progress);
