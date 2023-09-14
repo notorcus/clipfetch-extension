@@ -61,7 +61,6 @@ export const downloadYT = async (
     
     console.log("Merged file path:", mergedFilePath);
 
-    // Delete the temporary video and audio files
     importFile(mergedFilePath);
     deleteFile(videoFileData.absFilePath);
     deleteFile(audioFileData.absFilePath);
@@ -71,7 +70,12 @@ export const downloadYT = async (
   }
 };
 
-export const downloadDrive = async (inputValue: string, videoFormatId: string, outputPath: string) => {
+export const downloadDrive = async (
+  inputValue: string, 
+  videoFormatId: string, 
+  outputPath: string,
+  onProgress?: (progress: number) => void
+) => {
   if (inputValue === '') {
     console.log("Input field is empty.");
     return;
@@ -82,17 +86,18 @@ export const downloadDrive = async (inputValue: string, videoFormatId: string, o
   try {
     const videoTitle = await getVideoTitle(inputValue);
     
-    // Remove the extension from the video title
     console.log("Drive file Title:", videoTitle);
   
-    // Then download the video stream using the title without extension
     const videoFileData = await downloadDriveStream(
       inputValue, 
       videoFormatId, 
       outputPath, 
       videoTitle,
-      (progress) => {  // This is the onProgress callback
+      (progress) => {
         console.log(`Download progress: ${progress}%`);
+        if (onProgress) {
+          onProgress(progress);
+        }
       }
     );
   

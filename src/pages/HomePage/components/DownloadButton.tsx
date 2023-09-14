@@ -29,9 +29,11 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
     }
     
     try {
+
+      const videoTitle = await getVideoTitle(inputValue);
+      const videoId = Date.now();
+
       if (platform?.toLowerCase() === 'youtube') {
-        const videoTitle = await getVideoTitle(inputValue);
-        const videoId = Date.now();
 
         onNewVideoDownload(videoId, videoTitle);
 
@@ -39,7 +41,12 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
           onProgressUpdate(videoId, progress);
         });
       } else if (platform?.toLowerCase() === 'googledrive') {
-        await downloadDrive(inputValue, videoFormatId, outputPath);
+        
+        onNewVideoDownload(videoId, videoTitle);
+
+        await downloadDrive(inputValue, videoFormatId, outputPath, (progress) => {
+          onProgressUpdate(videoId, progress);
+        });
       }
       
       console.log('Download succeeded.');
